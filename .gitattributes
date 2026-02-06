@@ -1,0 +1,8 @@
+# Normalize text files to LF in repo (best for Docker/Linux/CI)
+* text=auto eol=lf
+
+# Keep Windows-specific files with CRLF if needed
+*.sln text eol=crlf
+*.csproj text eol=crlf
+*.props text eol=crlf
+*.targets text eol=crlf
