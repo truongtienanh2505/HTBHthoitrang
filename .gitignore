@@ -1,0 +1,29 @@
+﻿# --- secrets ---
+.env
+appsettings.Development.json
+**/appsettings.Development.json
+**/*secrets*.json
+
+# --- .NET build outputs ---
+bin/
+obj/
+**/bin/
+**/obj/
+
+# --- VS / VSCode ---
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# --- OS ---
+Thumbs.db
+.DS_Store
+
+# --- Logs ---
+*.log
+
+# --- Rider ---
+.idea/
