@@ -13,6 +13,7 @@ builder.Services.AddSwaggerGen();
 // DI
 builder.Services.AddInfrastructure(builder.Configuration);
 
+
 builder.Services.AddScoped<DanhMucService>();
 
 var app = builder.Build();
