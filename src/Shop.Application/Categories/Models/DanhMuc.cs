@@ -12,4 +12,5 @@ public class DanhMuc
 
     public DanhMuc? DanhMucCha { get; set; }
     public List<DanhMuc> DanhMucCon { get; set; } = new();
+    
 }
