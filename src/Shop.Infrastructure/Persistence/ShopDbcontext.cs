@@ -9,7 +9,9 @@ public class ShopDbContext : DbContext
     public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options) { }
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>(); 
+    public DbSet<Promotion> Promotions { get; set; }
 
+    
     public DbSet<DanhMuc> DanhMucs => Set<DanhMuc>();
     public DbSet<DanhMucTreeRow> DanhMucTreeRows => Set<DanhMucTreeRow>();
 
@@ -88,6 +90,10 @@ public class ShopDbContext : DbContext
             e.HasNoKey();
             e.ToView(null);
         });
+
+    base.OnModelCreating(modelBuilder);
+
+    modelBuilder.ApplyConfigurationsFromAssembly(typeof(ShopDbContext).Assembly);
         
     }
 }

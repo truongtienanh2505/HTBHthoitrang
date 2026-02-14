@@ -1,10 +1,12 @@
 using Shop.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+namespace Shop.Application.Products.Interfaces;
 using Shop.Application.Products.DTOs;
-using Shop.Application.Products.Dtos;
+
 
 public class ProductService : IProductService
 {
+    
     private readonly ShopDbContext _context;
 
     public ProductService(ShopDbContext context)

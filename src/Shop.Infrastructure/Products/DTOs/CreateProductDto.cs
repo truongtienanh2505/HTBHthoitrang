@@ -1,3 +1,5 @@
+namespace Shop.Application.Products.DTOs;
+
 public class CreateProductDto
 {
     public string TenSanPham { get; set; } = null!;
