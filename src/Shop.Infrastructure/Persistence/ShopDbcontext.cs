@@ -1,17 +1,26 @@
 using Microsoft.EntityFrameworkCore;
 using Shop.Application.Categories.Models;
+using Shop.Application.Products;
 
 namespace Shop.Infrastructure.Persistence;
 
 public class ShopDbContext : DbContext
 {
+    // Trong class ShopDbContext
+    public DbSet<DanhMuc> DanhMucs { get; set; } = null!;
+    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<ProductVariant> ProductVariants { get; set; } = null!;
+    public DbSet<ProductVariant> BienTheSanPhams { get; set; }
     public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options) { }
 
-    public DbSet<DanhMuc> DanhMucs => Set<DanhMuc>();
     public DbSet<DanhMucTreeRow> DanhMucTreeRows => Set<DanhMucTreeRow>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Product>().ToTable("SanPham");
+        modelBuilder.Entity<ProductVariant>().ToTable("BienTheSanPham");
+        modelBuilder.Entity<DanhMuc>().ToTable("DanhMuc");
         modelBuilder.Entity<DanhMuc>(e =>
         {
             e.ToTable("DanhMuc", "dbo");
@@ -34,5 +43,8 @@ public class ShopDbContext : DbContext
             e.HasNoKey();
             e.ToView(null);
         });
+        modelBuilder.Entity<ProductVariant>()
+        .Property(p => p.GiaBienThe)
+        .HasColumnType("decimal(18,2)");
     }
 }
