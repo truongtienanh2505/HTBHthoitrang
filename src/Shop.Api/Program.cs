@@ -2,7 +2,7 @@ using Shop.Application.Categories;
 using Shop.Infrastructure;
 using Shop.Infrastructure.Categories;
 using System.Text.Json.Serialization;
-
+using Shop.Application.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
@@ -18,6 +18,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddScoped<DanhMucService>();
+
+builder.Services.AddScoped<PromotionService>();
 
 var app = builder.Build();
 
