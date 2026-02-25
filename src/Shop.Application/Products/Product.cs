@@ -8,6 +8,10 @@ namespace Shop.Application.Products
     public class Product
     {
         [Key]
+        public int Id { get; set; }
+        public decimal Price { get; set; }  
+
+        public int Stock { get; set; }       
         public int MaSanPham { get; set; }
 
         [Required, MaxLength(200)]

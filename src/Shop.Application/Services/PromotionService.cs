@@ -1,44 +1,43 @@
-using Shop.Infrastructure.Persistence;// Đường dẫn chính xác đến thư mục chứa file context
-using Microsoft.EntityFrameworkCore;
+using Shop.Application.Interfaces;
+
 namespace Shop.Application.Services
 {
     public class PromotionService
     {
-        private readonly ShopDbContext _context;
+        private readonly IPromotionRepository _repository;
 
-        public PromotionService(ShopDbContext context)
+        public PromotionService(IPromotionRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
-        /// <summary>
-        /// Logic tính đúng giá sau giảm để phục vụ lưu Snapshot Data (Slide 93)
-        /// </summary>
-        public async Task<decimal> CalculateDiscountedPrice(int productId, decimal originalPrice)
+        public async Task<decimal> CalculateDiscountedPrice(
+            int productId,
+            decimal originalPrice)
         {
             var now = DateTime.Now;
 
-            // Tìm khuyến mãi hợp lệ: Đang kích hoạt và còn hạn sử dụng
-            var activePromotion = await _context.SanPhamKhuyenMais
-                .Include(spkm => spkm.KhuyenMai)
-                .Where(spkm => spkm.MaSanPham == productId 
-                               && spkm.KhuyenMai.KichHoat == true
-                               && spkm.KhuyenMai.NgayBatDau <= now 
-                               && spkm.KhuyenMai.NgayKetThuc >= now)
-                .Select(spkm => spkm.KhuyenMai)
-                .FirstOrDefaultAsync();
+            var promotions = await _repository
+                .GetActivePromotionsAsync(productId, now);
 
-            // Nếu không có khuyến mãi, trả về giá gốc ban đầu
-            if (activePromotion == null) return originalPrice;
+            decimal finalPrice = originalPrice;
 
-            // Tính toán giảm giá theo PERCENTAGE (Ví dụ: Giảm 20% cho sản phẩm 13)
-            if (activePromotion.LoaiGiamGia == "PERCENTAGE")
+            if (promotions != null && promotions.Any())
             {
-                var discountAmount = originalPrice * (activePromotion.GiaTriGiam / 100);
-                return originalPrice - discountAmount;
+                var best = promotions
+                    .OrderByDescending(p =>
+                        p.LoaiGiamGia == "PERCENTAGE"
+                            ? originalPrice * (p.GiaTriGiam / 100)
+                            : p.GiaTriGiam)
+                    .First();
+
+                if (best.LoaiGiamGia == "PERCENTAGE")
+                    finalPrice -= originalPrice * (best.GiaTriGiam / 100);
+                else
+                    finalPrice -= best.GiaTriGiam;
             }
 
-            return originalPrice;
+            return Math.Max(finalPrice, 0);
         }
     }
 }

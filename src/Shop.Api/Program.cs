@@ -3,6 +3,9 @@ using Shop.Infrastructure;
 using Shop.Infrastructure.Categories;
 using System.Text.Json.Serialization;
 using Shop.Application.Services;
+using Shop.Infrastructure.Repositories;
+using Shop.Application.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
@@ -21,6 +24,7 @@ builder.Services.AddScoped<DanhMucService>();
 
 builder.Services.AddScoped<PromotionService>();
 
+builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
