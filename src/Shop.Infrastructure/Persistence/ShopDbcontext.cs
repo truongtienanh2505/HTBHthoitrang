@@ -8,6 +8,8 @@ public class ShopDbContext : DbContext
     public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options) { }
 
     public DbSet<DanhMuc> DanhMucs => Set<DanhMuc>();
+
+    public DbSet<ProductCardRow> ProductCardRows => Set<ProductCardRow>();
     public DbSet<DanhMucTreeRow> DanhMucTreeRows => Set<DanhMucTreeRow>();
 
     public DbSet<PromotionCacheStatusRow> PromotionCacheStatusRows => Set<PromotionCacheStatusRow>();
@@ -37,6 +39,11 @@ public class ShopDbContext : DbContext
             e.ToView(null);
         });
         modelBuilder.Entity<PromotionCacheStatusRow>(e =>
+        {
+            e.HasNoKey();
+            e.ToView(null);
+        });
+        modelBuilder.Entity<ProductCardRow>(e =>
         {
             e.HasNoKey();
             e.ToView(null);

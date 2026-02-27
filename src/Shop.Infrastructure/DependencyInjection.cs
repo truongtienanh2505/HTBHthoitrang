@@ -6,6 +6,8 @@ using Shop.Infrastructure.Categories;
 using Shop.Infrastructure.Persistence;
 using Shop.Application.Promotions;
 using Shop.Infrastructure.Promotions;
+using Shop.Application.Products;
+using Shop.Infrastructure.Products;
 
 namespace Shop.Infrastructure;
 
@@ -18,6 +20,9 @@ public static class DependencyInjection
 
         services.AddScoped<IDanhMucRepository, DanhMucRepository>();
         services.AddScoped<IPromotionCacheRepository, PromotionCacheRepository>();
+        services.AddScoped<IProductQueryRepository, ProductQueryRepository>();
+
+
 
         return services;
     }
