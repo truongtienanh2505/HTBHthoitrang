@@ -1,6 +1,7 @@
 using Shop.Application.Categories;
 using Shop.Infrastructure;
 using Shop.Infrastructure.Categories;
+using Shop.Application.Promotions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ builder.Services.AddControllers();
 // Swagger UI (Swashbuckle)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<PromotionCacheService>();
 
 // DI
 builder.Services.AddInfrastructure(builder.Configuration);

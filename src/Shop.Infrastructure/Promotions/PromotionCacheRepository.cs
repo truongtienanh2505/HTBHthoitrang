@@ -18,7 +18,7 @@ public class PromotionCacheRepository : IPromotionCacheRepository
         SELECT
             MAX(CapNhatLuc) AS LastUpdatedUtc,
             CAST(COUNT(1) AS int) AS TotalRows
-        FROM dbo.ProductPromotions;
+        FROM dbo.ProductPromotions
         """;
 
         var row = await _db.PromotionCacheStatusRows
