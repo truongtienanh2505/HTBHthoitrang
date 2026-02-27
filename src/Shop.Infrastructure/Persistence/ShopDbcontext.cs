@@ -10,6 +10,8 @@ public class ShopDbContext : DbContext
     public DbSet<DanhMuc> DanhMucs => Set<DanhMuc>();
     public DbSet<DanhMucTreeRow> DanhMucTreeRows => Set<DanhMucTreeRow>();
 
+    public DbSet<PromotionCacheStatusRow> PromotionCacheStatusRows => Set<PromotionCacheStatusRow>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<DanhMuc>(e =>
@@ -30,6 +32,11 @@ public class ShopDbContext : DbContext
         });
 
         modelBuilder.Entity<DanhMucTreeRow>(e =>
+        {
+            e.HasNoKey();
+            e.ToView(null);
+        });
+        modelBuilder.Entity<PromotionCacheStatusRow>(e =>
         {
             e.HasNoKey();
             e.ToView(null);

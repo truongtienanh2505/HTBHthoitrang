@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Shop.Application.Categories;
 using Shop.Infrastructure.Categories;
 using Shop.Infrastructure.Persistence;
+using Shop.Application.Promotions;
+using Shop.Infrastructure.Promotions;
 
 namespace Shop.Infrastructure;
 
@@ -15,6 +17,7 @@ public static class DependencyInjection
             opt.UseSqlServer(configuration.GetConnectionString("Default")));
 
         services.AddScoped<IDanhMucRepository, DanhMucRepository>();
+        services.AddScoped<IPromotionCacheRepository, PromotionCacheRepository>();
 
         return services;
     }
