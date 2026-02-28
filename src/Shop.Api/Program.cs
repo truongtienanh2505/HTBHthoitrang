@@ -4,6 +4,7 @@ using Shop.Infrastructure.Categories;
 using Shop.Application.Promotions;
 using Shop.Api.BackgroundJobs;
 using Shop.Application.Products;
+using Shop.Application.AdminReports;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,8 @@ builder.Services.AddScoped<DanhMucService>();
 builder.Services.Configure<PromotionCacheOptions>(builder.Configuration.GetSection("PromotionCache"));
 builder.Services.AddHostedService<PromotionCacheHostedService>();
 builder.Services.AddScoped<ProductQueryService>();
+
+builder.Services.AddScoped<AdminReportService>();
 
 var app = builder.Build();
 

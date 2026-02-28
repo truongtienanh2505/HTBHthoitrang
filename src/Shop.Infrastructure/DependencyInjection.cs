@@ -8,6 +8,8 @@ using Shop.Application.Promotions;
 using Shop.Infrastructure.Promotions;
 using Shop.Application.Products;
 using Shop.Infrastructure.Products;
+using Shop.Application.AdminReports;
+using Shop.Infrastructure.AdminReports;
 
 namespace Shop.Infrastructure;
 
@@ -21,6 +23,7 @@ public static class DependencyInjection
         services.AddScoped<IDanhMucRepository, DanhMucRepository>();
         services.AddScoped<IPromotionCacheRepository, PromotionCacheRepository>();
         services.AddScoped<IProductQueryRepository, ProductQueryRepository>();
+        services.AddScoped<IAdminReportRepository, AdminReportRepository>();
 
 
 

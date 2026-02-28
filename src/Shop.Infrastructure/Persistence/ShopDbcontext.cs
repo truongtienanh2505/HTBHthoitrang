@@ -14,6 +14,11 @@ public class ShopDbContext : DbContext
 
     public DbSet<PromotionCacheStatusRow> PromotionCacheStatusRows => Set<PromotionCacheStatusRow>();
 
+    public object RevenueByDayRows { get; internal set; }
+
+    public DbSet<RevenueByDayRow> RevenueByDayRow => Set<RevenueByDayRow>();
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<DanhMuc>(e =>
@@ -44,6 +49,12 @@ public class ShopDbContext : DbContext
             e.ToView(null);
         });
         modelBuilder.Entity<ProductCardRow>(e =>
+        {
+            e.HasNoKey();
+            e.ToView(null);
+        });
+
+        modelBuilder.Entity<RevenueByDayRow>(e =>
         {
             e.HasNoKey();
             e.ToView(null);
