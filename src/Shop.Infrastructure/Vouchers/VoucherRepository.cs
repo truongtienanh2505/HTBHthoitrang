@@ -55,8 +55,7 @@ public sealed class VoucherRepository : IVoucherRepository
         var updateSql = """
         UPDATE dbo.MaGiamGia
         SET DaDung = 1,
-            DungLuc = {2},
-            MaNguoiDung = COALESCE(MaNguoiDung, {1})
+            DungLuc = {2}
         WHERE MaMaGiamGia = {0}
           AND DaDung = 0
           AND HetHanLuc > {2}
@@ -104,7 +103,7 @@ public sealed class VoucherRepository : IVoucherRepository
         km.GiamToiDa
     FROM dbo.MaGiamGia mg
     JOIN dbo.KhuyenMai km ON km.MaKhuyenMai = mg.MaKhuyenMai
-    WHERE mg.Code = {0};
+    WHERE mg.Code = {0}
     """;
 
     const string SqlLocked = """
@@ -124,7 +123,7 @@ public sealed class VoucherRepository : IVoucherRepository
         km.GiamToiDa
     FROM dbo.MaGiamGia mg WITH (UPDLOCK, HOLDLOCK, ROWLOCK)
     JOIN dbo.KhuyenMai km ON km.MaKhuyenMai = mg.MaKhuyenMai
-    WHERE mg.Code = {0};
+    WHERE mg.Code = {0}
     """;
 
     var sql = lockForUpdate ? SqlLocked : SqlUnlocked;
