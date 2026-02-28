@@ -6,10 +6,19 @@ using Shop.Api.BackgroundJobs;
 using Shop.Application.Products;
 using Shop.Application.AdminReports;
 using Shop.Application.Vouchers;
+using Shop.Api.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services
+    .AddAuthentication(DevHeaderAuthDefaults.Scheme)
+    .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, DevHeaderAuthHandler>(
+        DevHeaderAuthDefaults.Scheme,
+        _ => { });
+
+builder.Services.AddAuthorization();
 
 // Swagger UI (Swashbuckle)
 builder.Services.AddEndpointsApiExplorer();
@@ -30,6 +39,8 @@ builder.Services.AddScoped<AdminReportService>();
 
 builder.Services.AddScoped<VoucherService>();
 
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -41,5 +52,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
