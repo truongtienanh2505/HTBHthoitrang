@@ -7,14 +7,19 @@ using Shop.Application.Products;
 using Shop.Application.AdminReports;
 using Shop.Application.Vouchers;
 using Shop.Api.Auth;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
 builder.Services
-    .AddAuthentication(DevHeaderAuthDefaults.Scheme)
-    .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, DevHeaderAuthHandler>(
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = DevHeaderAuthDefaults.Scheme;
+        options.DefaultChallengeScheme = DevHeaderAuthDefaults.Scheme;
+    })
+    .AddScheme<AuthenticationSchemeOptions, DevHeaderAuthHandler>(
         DevHeaderAuthDefaults.Scheme,
         _ => { });
 
@@ -90,9 +95,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();
