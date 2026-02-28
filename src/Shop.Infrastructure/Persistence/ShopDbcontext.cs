@@ -18,6 +18,9 @@ public class ShopDbContext : DbContext
 
     public DbSet<RevenueByDayRow> RevenueByDayRow => Set<RevenueByDayRow>();
 
+    public DbSet<VoucherInspectRow> VoucherInspectRows => Set<VoucherInspectRow>();
+
+    public object VoucherInspectRow { get; internal set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +59,12 @@ public class ShopDbContext : DbContext
 
         modelBuilder.Entity<RevenueByDayRow>(e =>
         {
+            e.HasNoKey();
+            e.ToView(null);
+        });
+
+        modelBuilder.Entity<VoucherInspectRow>(e =>
+        { 
             e.HasNoKey();
             e.ToView(null);
         });

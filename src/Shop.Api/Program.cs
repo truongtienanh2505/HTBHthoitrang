@@ -5,6 +5,7 @@ using Shop.Application.Promotions;
 using Shop.Api.BackgroundJobs;
 using Shop.Application.Products;
 using Shop.Application.AdminReports;
+using Shop.Application.Vouchers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ builder.Services.AddHostedService<PromotionCacheHostedService>();
 builder.Services.AddScoped<ProductQueryService>();
 
 builder.Services.AddScoped<AdminReportService>();
+
+builder.Services.AddScoped<VoucherService>();
 
 var app = builder.Build();
 

@@ -10,6 +10,8 @@ using Shop.Application.Products;
 using Shop.Infrastructure.Products;
 using Shop.Application.AdminReports;
 using Shop.Infrastructure.AdminReports;
+using Shop.Application.Vouchers;
+using Shop.Infrastructure.Vouchers;
 
 namespace Shop.Infrastructure;
 
@@ -24,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IPromotionCacheRepository, PromotionCacheRepository>();
         services.AddScoped<IProductQueryRepository, ProductQueryRepository>();
         services.AddScoped<IAdminReportRepository, AdminReportRepository>();
+        services.AddScoped<IVoucherRepository, VoucherRepository>();
 
 
 
