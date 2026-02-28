@@ -22,7 +22,47 @@ builder.Services.AddAuthorization();
 
 // Swagger UI (Swashbuckle)
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c => {c.AddSecurityDefinition("DevHeaderUserId", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+{
+    Name = "X-Dev-UserId",
+    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+    Description = "DEV only. Example: 1"
+});
+
+c.AddSecurityDefinition("DevHeaderRole", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+{
+    Name = "X-Dev-Role",
+    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+    Description = "DEV only. Example: Admin or User"
+});
+
+c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+{
+    {
+        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+        {
+            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+            {
+                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                Id = "DevHeaderUserId"
+            }
+        },
+        Array.Empty<string>()
+    },
+    {
+        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+        {
+            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+            {
+                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                Id = "DevHeaderRole"
+            }
+        },
+        Array.Empty<string>()
+    }
+}); });
 builder.Services.AddScoped<PromotionCacheService>();
 
 
