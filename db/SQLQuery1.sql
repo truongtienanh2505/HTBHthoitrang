@@ -1370,3 +1370,39 @@ BEGIN
     INCLUDE ([UrlAnh], [ThuTu]);
 END
 GO
+
+/*
+============================================================
+Seed data tối thiểu cho DEV (tuần 4)
+- VaiTro (Admin/User)
+- TrangThaiDonHang (đảm bảo có MaTrangThai = 4 là "Thành công")
+============================================================
+*/
+USE [HeThongBanHangThoiTrangDB];
+GO
+
+-- VaiTro
+IF NOT EXISTS (SELECT 1 FROM dbo.VaiTro WHERE MaVaiTro = 1)
+    INSERT dbo.VaiTro (MaVaiTro, TenVaiTro) VALUES (1, N'Admin');
+
+IF NOT EXISTS (SELECT 1 FROM dbo.VaiTro WHERE MaVaiTro = 2)
+    INSERT dbo.VaiTro (MaVaiTro, TenVaiTro) VALUES (2, N'User');
+GO
+
+-- TrangThaiDonHang
+IF NOT EXISTS (SELECT 1 FROM dbo.TrangThaiDonHang WHERE MaTrangThai = 1)
+    INSERT dbo.TrangThaiDonHang (MaTrangThai, TenTrangThai, ThuTu) VALUES (1, N'Mới tạo', 1);
+
+IF NOT EXISTS (SELECT 1 FROM dbo.TrangThaiDonHang WHERE MaTrangThai = 2)
+    INSERT dbo.TrangThaiDonHang (MaTrangThai, TenTrangThai, ThuTu) VALUES (2, N'Đã thanh toán', 2);
+
+IF NOT EXISTS (SELECT 1 FROM dbo.TrangThaiDonHang WHERE MaTrangThai = 3)
+    INSERT dbo.TrangThaiDonHang (MaTrangThai, TenTrangThai, ThuTu) VALUES (3, N'Đang giao', 3);
+
+-- IMPORTANT: mốc "Thành công" đang được dùng ở thống kê (MaTrangThai = 4)
+IF NOT EXISTS (SELECT 1 FROM dbo.TrangThaiDonHang WHERE MaTrangThai = 4)
+    INSERT dbo.TrangThaiDonHang (MaTrangThai, TenTrangThai, ThuTu) VALUES (4, N'Thành công', 4);
+
+IF NOT EXISTS (SELECT 1 FROM dbo.TrangThaiDonHang WHERE MaTrangThai = 5)
+    INSERT dbo.TrangThaiDonHang (MaTrangThai, TenTrangThai, ThuTu) VALUES (5, N'Đã hủy', 5);
+GO
