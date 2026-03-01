@@ -525,6 +525,8 @@ CREATE TABLE [dbo].[MaGiamGia](
 	[Code] [varchar](50) NOT NULL,
 	[MaNguoiDung] [int] NULL,
 	[MaKhuyenMai] [int] NOT NULL,
+	[SoLanToiDa] [int] NOT NULL,
+    [SoLanDaDung] [int] NOT NULL,
 	[DaDung] [bit] NOT NULL,
 	[DungLuc] [datetime2](0) NULL,
 	[HetHanLuc] [datetime2](0) NOT NULL,
@@ -820,7 +822,8 @@ GO
 CREATE NONCLUSTERED INDEX [IX_MaGiamGia_User_Usage] ON [dbo].[MaGiamGia]
 (
 	[MaNguoiDung] ASC,
-	[DaDung] ASC,
+	[SoLanDaDung] ASC,
+    [SoLanToiDa] ASC,
 	[HetHanLuc] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 GO
@@ -955,6 +958,10 @@ GO
 ALTER TABLE [dbo].[KhuyenMai] ADD  CONSTRAINT [DF_KhuyenMai_TaoLuc]  DEFAULT (sysutcdatetime()) FOR [TaoLuc]
 GO
 ALTER TABLE [dbo].[LichSuTrangThaiDonHang] ADD  CONSTRAINT [DF_LichSuTrangThaiDonHang_ThoiGian]  DEFAULT (sysutcdatetime()) FOR [ThoiGian]
+GO
+ALTER TABLE [dbo].[MaGiamGia] ADD  CONSTRAINT [DF_MaGiamGia_SoLanToiDa]  DEFAULT ((1)) FOR [SoLanToiDa]
+GO
+ALTER TABLE [dbo].[MaGiamGia] ADD  CONSTRAINT [DF_MaGiamGia_SoLanDaDung]  DEFAULT ((0)) FOR [SoLanDaDung]
 GO
 ALTER TABLE [dbo].[MaGiamGia] ADD  CONSTRAINT [DF_MaGiamGia_DaDung]  DEFAULT ((0)) FOR [DaDung]
 GO
@@ -1219,10 +1226,18 @@ ALTER TABLE [dbo].[KhuyenMai]  WITH CHECK ADD  CONSTRAINT [CK_KhuyenMai_Ngay] CH
 GO
 ALTER TABLE [dbo].[KhuyenMai] CHECK CONSTRAINT [CK_KhuyenMai_Ngay]
 GO
-ALTER TABLE [dbo].[MaGiamGia]  WITH CHECK ADD  CONSTRAINT [CK_MaGiamGia_DungLuc] CHECK  (([DaDung]=(0) AND [DungLuc] IS NULL OR [DaDung]=(1) AND [DungLuc] IS NOT NULL))
+ALTER TABLE [dbo].[MaGiamGia]  WITH CHECK ADD  CONSTRAINT [CK_MaGiamGia_SoLan]
+CHECK (([SoLanToiDa]>=(1) AND [SoLanDaDung]>=(0) AND [SoLanDaDung]<=[SoLanToiDa]))
+GO
+ALTER TABLE [dbo].[MaGiamGia] CHECK CONSTRAINT [CK_MaGiamGia_SoLan]
+GO
+
+ALTER TABLE [dbo].[MaGiamGia]  WITH CHECK ADD  CONSTRAINT [CK_MaGiamGia_DungLuc]
+CHECK (([SoLanDaDung]=(0) AND [DungLuc] IS NULL OR [SoLanDaDung]>(0) AND [DungLuc] IS NOT NULL))
 GO
 ALTER TABLE [dbo].[MaGiamGia] CHECK CONSTRAINT [CK_MaGiamGia_DungLuc]
 GO
+
 ALTER TABLE [dbo].[MaGiamGia]  WITH CHECK ADD  CONSTRAINT [CK_MaGiamGia_HetHan] CHECK  (([HetHanLuc]>[TaoLuc]))
 GO
 ALTER TABLE [dbo].[MaGiamGia] CHECK CONSTRAINT [CK_MaGiamGia_HetHan]

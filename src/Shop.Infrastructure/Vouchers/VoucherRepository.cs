@@ -54,13 +54,14 @@ public sealed class VoucherRepository : IVoucherRepository
 
         var updateSql = """
         UPDATE dbo.MaGiamGia
-        SET DaDung = 1,
-            DungLuc = {2}
+        SET SoLanDaDung = SoLanDaDung + 1,
+            DungLuc = {2},
+            DaDung = CASE WHEN SoLanDaDung + 1 >= SoLanToiDa THEN 1 ELSE 0 END
         WHERE MaMaGiamGia = {0}
-          AND DaDung = 0
-          AND HetHanLuc > {2}
-          AND (MaNguoiDung IS NULL OR MaNguoiDung = {1});
-        """;
+            AND SoLanDaDung < SoLanToiDa
+            AND HetHanLuc > {2}
+            AND (MaNguoiDung IS NULL OR MaNguoiDung = {1});
+        """;        
 
         var affected = await _db.Database.ExecuteSqlRawAsync(
             updateSql,
@@ -81,7 +82,19 @@ public sealed class VoucherRepository : IVoucherRepository
         }
 
         await tx.CommitAsync(ct);
-        return evaluated;
+
+// lockedRow là trạng thái trước UPDATE, nên sau consume sẽ là +1
+        var usedAfter = lockedRow!.SoLanDaDung + 1;
+        var maxUses = lockedRow.SoLanToiDa;
+        var remaining = Math.Max(0, maxUses - usedAfter);
+
+        return evaluated with
+        {
+            SoLanDaDung = usedAfter,
+            SoLanToiDa = maxUses,
+            SoLanConLai = remaining
+        };
+        
     }
 
     private Task<VoucherInspectRow?> ReadVoucherAsync(string code, bool lockForUpdate, CancellationToken ct)
@@ -92,6 +105,8 @@ public sealed class VoucherRepository : IVoucherRepository
         mg.Code,
         mg.MaNguoiDung,
         mg.MaKhuyenMai,
+        mg.SoLanToiDa,
+        mg.SoLanDaDung,
         mg.DaDung,
         mg.DungLuc,
         mg.HetHanLuc,
@@ -112,6 +127,8 @@ public sealed class VoucherRepository : IVoucherRepository
         mg.Code,
         mg.MaNguoiDung,
         mg.MaKhuyenMai,
+        mg.SoLanToiDa,
+        mg.SoLanDaDung,
         mg.DaDung,
         mg.DungLuc,
         mg.HetHanLuc,
@@ -141,8 +158,8 @@ public sealed class VoucherRepository : IVoucherRepository
 
         var now = DateTime.UtcNow;
 
-        if (row.DaDung)
-            return new(VoucherApplyStatus.AlreadyUsed, code, 0m, row.MaMaGiamGia, row.MaKhuyenMai, "Voucher đã được sử dụng.");
+        if (row.DaDung || row.SoLanDaDung >= row.SoLanToiDa)
+            return new(VoucherApplyStatus.AlreadyUsed, code, 0m, row.MaMaGiamGia, row.MaKhuyenMai, "Voucher đã hết lượt sử dụng.");
 
         if (row.HetHanLuc <= now)
             return new(VoucherApplyStatus.Expired, code, 0m, row.MaMaGiamGia, row.MaKhuyenMai, "Voucher đã hết hạn.");

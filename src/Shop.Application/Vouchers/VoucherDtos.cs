@@ -19,5 +19,10 @@ public sealed record VoucherApplyResultDto(
     decimal TienGiam,
     int? MaMaGiamGia,
     int? MaKhuyenMai,
-    string? Message
-);
+    string Message
+)
+{
+    public int? SoLanDaDung { get; init; }
+    public int? SoLanToiDa { get; init; }
+    public int? SoLanConLai { get; init; }
+}

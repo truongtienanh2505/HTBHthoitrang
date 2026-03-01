@@ -9,6 +9,9 @@ public sealed class VoucherInspectRow
     public string Code { get; set; } = null!;
     public int? MaNguoiDung { get; set; }
     public int MaKhuyenMai { get; set; }
+
+    public int SoLanToiDa { get; set; }
+    public int SoLanDaDung { get; set; }
     public bool DaDung { get; set; }
     public DateTime? DungLuc { get; set; }
     public DateTime HetHanLuc { get; set; }
