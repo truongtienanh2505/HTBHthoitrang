@@ -1,12 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+
 namespace Shop.Application.Products
 {
     [Table("BienTheSanPham")]
     public class ProductVariant
     {
         [Key]
+           public int ProductVariantId { get; set; }
+        public int ProductId { get; set; }
+        public decimal Price { get; set; }
+        public int Stock { get; set; }
         public int MaBienThe { get; set; }
          public int MaSanPham { get; set; }
         public string? KichThuoc { get; set; }

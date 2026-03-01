@@ -10,6 +10,9 @@ public class ShopDbContext : DbContext
     public DbSet<SanPhamKhuyenMai> SanPhamKhuyenMais => Set<SanPhamKhuyenMai>();
     public DbSet<DanhMuc> DanhMucs { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Order> Orders { get; set; }
+
+    public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<ProductVariant> ProductVariants { get; set; } = null!;
     public DbSet<ProductVariant> BienTheSanPhams { get; set; }
     public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options) { }
@@ -88,6 +91,9 @@ public class ShopDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
             
 });
+    modelBuilder.Entity<ProductVariant>()
+        .ToTable("ProductVariants");
 
+    base.OnModelCreating(modelBuilder);
 }
 }

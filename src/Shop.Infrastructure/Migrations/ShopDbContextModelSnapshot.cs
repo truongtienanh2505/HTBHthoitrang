@@ -69,6 +69,64 @@ namespace Shop.Infrastructure.Migrations
                     b.ToTable("KhuyenMai", "dbo");
                 });
 
+            modelBuilder.Entity("Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("OrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductVariantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItems");
+                });
+
             modelBuilder.Entity("Shop.Application.Categories.Models.DanhMuc", b =>
                 {
                     b.Property<int>("MaDanhMuc")
@@ -197,11 +255,11 @@ namespace Shop.Infrastructure.Migrations
 
             modelBuilder.Entity("Shop.Application.Products.Product", b =>
                 {
-                    b.Property<int>("MaSanPham")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaSanPham"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AnhDaiDien")
                         .HasColumnType("nvarchar(max)");
@@ -218,13 +276,22 @@ namespace Shop.Infrastructure.Migrations
                     b.Property<int>("MaDanhMuc")
                         .HasColumnType("int");
 
+                    b.Property<int>("MaSanPham")
+                        .HasColumnType("int");
+
                     b.Property<string>("MoTa")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("TaoLuc")
                         .HasColumnType("datetime2");
@@ -234,7 +301,7 @@ namespace Shop.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.HasKey("MaSanPham");
+                    b.HasKey("Id");
 
                     b.HasIndex("MaDanhMuc");
 
@@ -243,11 +310,11 @@ namespace Shop.Infrastructure.Migrations
 
             modelBuilder.Entity("Shop.Application.Products.ProductVariant", b =>
                 {
-                    b.Property<int>("MaBienThe")
+                    b.Property<int>("ProductVariantId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaBienThe"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductVariantId"));
 
                     b.Property<decimal>("DieuChinhGia")
                         .HasColumnType("decimal(18,2)");
@@ -261,6 +328,9 @@ namespace Shop.Infrastructure.Migrations
                     b.Property<string>("KichThuoc")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("MaBienThe")
+                        .HasColumnType("int");
+
                     b.Property<int>("MaKichCo")
                         .HasColumnType("int");
 
@@ -273,6 +343,12 @@ namespace Shop.Infrastructure.Migrations
                     b.Property<string>("MauSac")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Sku")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -281,11 +357,25 @@ namespace Shop.Infrastructure.Migrations
                     b.Property<int>("SoLuongTon")
                         .HasColumnType("int");
 
-                    b.HasKey("MaBienThe");
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductVariantId");
 
                     b.HasIndex("MaSanPham");
 
-                    b.ToTable("BienTheSanPham", (string)null);
+                    b.ToTable("ProductVariants", (string)null);
+                });
+
+            modelBuilder.Entity("OrderItem", b =>
+                {
+                    b.HasOne("Order", "Order")
+                        .WithMany("Items")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Shop.Application.Categories.Models.DanhMuc", b =>
@@ -355,6 +445,11 @@ namespace Shop.Infrastructure.Migrations
                     b.Navigation("DieuKiens");
 
                     b.Navigation("SanPhamKhuyenMais");
+                });
+
+            modelBuilder.Entity("Order", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Shop.Application.Categories.Models.DanhMuc", b =>

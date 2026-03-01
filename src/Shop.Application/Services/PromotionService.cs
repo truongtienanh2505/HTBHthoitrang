@@ -22,20 +22,38 @@ namespace Shop.Application.Services
 
             decimal finalPrice = originalPrice;
 
-            if (promotions != null && promotions.Any())
+           if (promotions != null && promotions.Any())
+{
+    // Tìm khuyến mãi tốt nhất dựa trên giá trị giảm thực tế
+    var best = promotions
+        .OrderByDescending(p =>
+        {
+            if (p.LoaiGiamGia == "PERCENTAGE")
             {
-                var best = promotions
-                    .OrderByDescending(p =>
-                        p.LoaiGiamGia == "PERCENTAGE"
-                            ? originalPrice * (p.GiaTriGiam / 100)
-                            : p.GiaTriGiam)
-                    .First();
-
-                if (best.LoaiGiamGia == "PERCENTAGE")
-                    finalPrice -= originalPrice * (best.GiaTriGiam / 100);
-                else
-                    finalPrice -= best.GiaTriGiam;
+                var amount = originalPrice * (p.GiaTriGiam / 100);
+                // Nếu có GiamToiDa, lấy giá trị nhỏ hơn giữa mức % và mức trần
+                return p.GiamToiDa.HasValue ? Math.Min(amount, p.GiamToiDa.Value) : amount;
             }
+            return p.GiaTriGiam;
+        })
+        .First();
+
+    // Áp dụng giảm giá vào giá cuối cùng
+    if (best.LoaiGiamGia == "PERCENTAGE")
+    {
+        var discountAmount = originalPrice * (best.GiaTriGiam / 100);
+        // Kiểm tra lại GiamToiDa một lần nữa khi trừ tiền
+        if (best.GiamToiDa.HasValue)
+        {
+            discountAmount = Math.Min(discountAmount, best.GiamToiDa.Value);
+        }
+        finalPrice -= discountAmount;
+    }
+    else
+    {
+        finalPrice -= best.GiaTriGiam;
+    }
+}
 
             return Math.Max(finalPrice, 0);
         }

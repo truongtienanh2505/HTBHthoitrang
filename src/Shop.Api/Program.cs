@@ -5,7 +5,9 @@ using System.Text.Json.Serialization;
 using Shop.Application.Services;
 using Shop.Infrastructure.Repositories;
 using Shop.Application.Interfaces;
-
+using Microsoft.EntityFrameworkCore;
+using Shop.Infrastructure.Persistence;
+using Shop.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
@@ -25,6 +27,8 @@ builder.Services.AddScoped<DanhMucService>();
 builder.Services.AddScoped<PromotionService>();
 
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+
+builder.Services.AddScoped<CheckoutService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
