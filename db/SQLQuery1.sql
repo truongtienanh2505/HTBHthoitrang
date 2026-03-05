@@ -1421,3 +1421,226 @@ IF NOT EXISTS (SELECT 1 FROM dbo.TrangThaiDonHang WHERE MaTrangThai = 4)
 IF NOT EXISTS (SELECT 1 FROM dbo.TrangThaiDonHang WHERE MaTrangThai = 5)
     INSERT dbo.TrangThaiDonHang (MaTrangThai, TenTrangThai, ThuTu) VALUES (5, N'Đã hủy', 5);
 GO
+
+
+
+
+/* ============================================================
+   15) SEED SAN PHAM MAU (20 sp) + ANH + 4 BIEN THE / SP (DEV)
+   - Anh dung placeholder tu picsum.photos (co the thay bang CDN cua may)
+   - Re-run safe (IF NOT EXISTS)
+   ============================================================ */
+
+USE [HeThongBanHangThoiTrangDB];
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+GO
+
+BEGIN TRY
+    BEGIN TRAN;
+
+    DECLARE @Now DATETIME2(0) = SYSUTCDATETIME();
+
+    /* 1) DanhMuc (neu chua co) */
+    IF NOT EXISTS (SELECT 1 FROM dbo.DanhMuc WHERE Slug = 'ao')
+        INSERT dbo.DanhMuc (TenDanhMuc, Slug, MaDanhMucCha) VALUES (N'Áo', 'ao', NULL);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DanhMuc WHERE Slug = 'quan')
+        INSERT dbo.DanhMuc (TenDanhMuc, Slug, MaDanhMucCha) VALUES (N'Quần', 'quan', NULL);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DanhMuc WHERE Slug = 'vay')
+        INSERT dbo.DanhMuc (TenDanhMuc, Slug, MaDanhMucCha) VALUES (N'Váy', 'vay', NULL);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DanhMuc WHERE Slug = 'do-ni')
+        INSERT dbo.DanhMuc (TenDanhMuc, Slug, MaDanhMucCha) VALUES (N'Đồ nỉ', 'do-ni', NULL);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DanhMuc WHERE Slug = 'ao-khoac')
+        INSERT dbo.DanhMuc (TenDanhMuc, Slug, MaDanhMucCha) VALUES (N'Áo khoác', 'ao-khoac', NULL);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DanhMuc WHERE Slug = 'phu-kien')
+        INSERT dbo.DanhMuc (TenDanhMuc, Slug, MaDanhMucCha) VALUES (N'Phụ kiện', 'phu-kien', NULL);
+
+    /* 2) KichCo + MauSac (toi thieu de tao bien the) */
+    IF NOT EXISTS (SELECT 1 FROM dbo.KichCo WHERE TenKichCo = 'M') INSERT dbo.KichCo(TenKichCo) VALUES ('M');
+    IF NOT EXISTS (SELECT 1 FROM dbo.KichCo WHERE TenKichCo = 'L') INSERT dbo.KichCo(TenKichCo) VALUES ('L');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.MauSac WHERE TenMau = N'Đen')   INSERT dbo.MauSac(TenMau, MaHex) VALUES (N'Đen',   '#000000');
+    IF NOT EXISTS (SELECT 1 FROM dbo.MauSac WHERE TenMau = N'Trắng') INSERT dbo.MauSac(TenMau, MaHex) VALUES (N'Trắng', '#FFFFFF');
+
+    DECLARE @SizeM INT = (SELECT MaKichCo FROM dbo.KichCo WHERE TenKichCo = 'M');
+    DECLARE @SizeL INT = (SELECT MaKichCo FROM dbo.KichCo WHERE TenKichCo = 'L');
+    DECLARE @ColorBlack INT = (SELECT MaMauSac FROM dbo.MauSac WHERE TenMau = N'Đen');
+    DECLARE @ColorWhite INT = (SELECT MaMauSac FROM dbo.MauSac WHERE TenMau = N'Trắng');
+
+    /* 3) SanPham */
+    DECLARE @Products TABLE (
+        Slug VARCHAR(200) NOT NULL PRIMARY KEY,
+        TenSanPham NVARCHAR(200) NOT NULL,
+        DanhMucSlug VARCHAR(100) NOT NULL,
+        MoTa NVARCHAR(500) NULL,
+        GiaGoc DECIMAL(18,2) NOT NULL,
+        SkuPrefix VARCHAR(20) NOT NULL
+    );
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('ao-thun-basic-cotton-240gsm', N'Áo thun basic cotton 240gsm', 'ao', N'Cotton dày 240gsm, form gọn, mặc hằng ngày.', 199000.00, 'SP001');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('ao-thun-oversize-graphic', N'Áo thun oversize graphic', 'ao', N'Oversize thoải mái, in graphic nổi bật.', 239000.00, 'SP002');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('ao-polo-pique', N'Áo polo pique', 'ao', N'Vải pique thoáng, cổ đứng chuẩn chỉnh.', 279000.00, 'SP003');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('ao-so-mi-oxford', N'Áo sơ mi Oxford', 'ao', N'Oxford dệt chéo, lịch sự mà vẫn trẻ.', 329000.00, 'SP004');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('ao-so-mi-linen', N'Áo sơ mi linen', 'ao', N'Linen mát, hợp đi biển và đi làm.', 349000.00, 'SP005');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('quan-jean-slim', N'Quần jean slim fit', 'quan', N'Slim fit tôn dáng, co giãn nhẹ.', 399000.00, 'SP006');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('quan-jean-straight', N'Quần jean straight', 'quan', N'Ống đứng cổ điển, dễ phối đồ.', 419000.00, 'SP007');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('quan-short-kaki', N'Quần short kaki', 'quan', N'Kaki đứng form, mặc mát ngày nóng.', 249000.00, 'SP008');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('chan-vay-chu-a', N'Chân váy chữ A', 'vay', N'Dáng chữ A, tôn eo, dễ mix áo.', 289000.00, 'SP009');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('vay-maxi-hoa', N'Váy maxi hoa', 'vay', N'Maxi nhẹ, hoạ tiết hoa, bay bổng.', 459000.00, 'SP010');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('hoodie-ni', N'Hoodie nỉ basic', 'do-ni', N'Nỉ bông ấm, logo tối giản.', 389000.00, 'SP011');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('sweater-len', N'Sweater len mỏng', 'do-ni', N'Len mỏng, mặc layer cực ổn.', 359000.00, 'SP012');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('ao-khoac-bomber', N'Áo khoác bomber', 'ao-khoac', N'Bomber nhẹ, khoá kéo, form gọn.', 499000.00, 'SP013');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('ao-khoac-denim', N'Áo khoác denim', 'ao-khoac', N'Denim bền, càng mặc càng đẹp.', 529000.00, 'SP014');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('tui-tote-canvas', N'Túi tote canvas', 'phu-kien', N'Canvas dày, đựng laptop vừa đủ.', 179000.00, 'SP015');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('non-bucket', N'Nón bucket', 'phu-kien', N'Bucket vành vừa, che nắng ổn.', 159000.00, 'SP016');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('that-lung-da', N'Thắt lưng da', 'phu-kien', N'Da PU/da tổng hợp, khoá kim.', 199000.00, 'SP017');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('vo-co-cao', N'Vớ cổ cao', 'phu-kien', N'Cotton co giãn, cổ cao thể thao.', 59000.00, 'SP018');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('ao-tank-top', N'Áo tank top', 'ao', N'Tank top ôm vừa, thấm hút tốt.', 149000.00, 'SP019');
+
+    INSERT INTO @Products(Slug, TenSanPham, DanhMucSlug, MoTa, GiaGoc, SkuPrefix)
+    VALUES ('quan-jogger', N'Quần jogger', 'quan', N'Jogger bo gấu, mặc đi chơi/đi tập.', 329000.00, 'SP020');
+
+    ;WITH Src AS (
+        SELECT p.Slug, p.TenSanPham, p.MoTa, p.GiaGoc, dm.MaDanhMuc
+        FROM @Products p
+        JOIN dbo.DanhMuc dm ON dm.Slug = p.DanhMucSlug
+    )
+    MERGE dbo.SanPham AS t
+    USING Src AS s
+       ON t.Slug = s.Slug
+    WHEN NOT MATCHED THEN
+        INSERT (TenSanPham, Slug, MoTa, GiaGoc, MaDanhMuc, AnhDaiDien)
+        VALUES (s.TenSanPham, s.Slug, s.MoTa, s.GiaGoc, s.MaDanhMuc, NULL);
+
+    /* 4) AnhSanPham (3 anh / sp, 1 anh chinh) */
+    ;WITH ImgSrc AS (
+        SELECT
+            sp.MaSanPham,
+            x.ThuTu,
+            x.AnhChinh,
+            x.UrlAnh
+        FROM @Products p
+        JOIN dbo.SanPham sp ON sp.Slug = p.Slug
+        CROSS APPLY (VALUES
+            (1, CAST(1 AS bit), CONCAT('https://picsum.photos/seed/', p.Slug, '-1/900/1200')),
+            (2, CAST(0 AS bit), CONCAT('https://picsum.photos/seed/', p.Slug, '-2/900/1200')),
+            (3, CAST(0 AS bit), CONCAT('https://picsum.photos/seed/', p.Slug, '-3/900/1200'))
+        ) x(ThuTu, AnhChinh, UrlAnh)
+    )
+    INSERT dbo.AnhSanPham(MaSanPham, UrlAnh, ThuTu, AnhChinh)
+    SELECT i.MaSanPham, i.UrlAnh, i.ThuTu, i.AnhChinh
+    FROM ImgSrc i
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.AnhSanPham a
+        WHERE a.MaSanPham = i.MaSanPham
+          AND a.UrlAnh = i.UrlAnh
+    )
+      AND (
+        i.AnhChinh = 0
+        OR NOT EXISTS (
+            SELECT 1 FROM dbo.AnhSanPham a2
+            WHERE a2.MaSanPham = i.MaSanPham
+              AND a2.AnhChinh = 1
+        )
+      );
+
+    /* 5) BienTheSanPham (4 bien the / sp: Den/Trang x M/L) */
+    ;WITH VarSrc AS (
+        SELECT
+            sp.MaSanPham,
+            c.MaMauSac,
+            k.MaKichCo,
+            CONCAT(p.SkuPrefix, '-', c.CodeMau, '-', k.CodeSize) AS SKU,
+            CAST(50 AS int) AS SoLuongTon,
+            CAST(0 AS decimal(18,2)) AS DieuChinhGia
+        FROM @Products p
+        JOIN dbo.SanPham sp ON sp.Slug = p.Slug
+        CROSS JOIN (VALUES
+            ('BLK', @ColorBlack),
+            ('WHT', @ColorWhite)
+        ) c(CodeMau, MaMauSac)
+        CROSS JOIN (VALUES
+            ('M', @SizeM),
+            ('L', @SizeL)
+        ) k(CodeSize, MaKichCo)
+    )
+    INSERT dbo.BienTheSanPham(MaSanPham, MaMauSac, MaKichCo, SKU, SoLuongTon, DieuChinhGia)
+    SELECT v.MaSanPham, v.MaMauSac, v.MaKichCo, v.SKU, v.SoLuongTon, v.DieuChinhGia
+    FROM VarSrc v
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.BienTheSanPham bt
+        WHERE bt.MaSanPham = v.MaSanPham
+          AND bt.MaMauSac = v.MaMauSac
+          AND bt.MaKichCo = v.MaKichCo
+    )
+      AND NOT EXISTS (
+        SELECT 1 FROM dbo.BienTheSanPham bt2
+        WHERE bt2.SKU = v.SKU
+      );
+
+    COMMIT;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0 ROLLBACK;
+    THROW;
+END CATCH
+GO
+
+-- Quick check
+SELECT TOP (20)
+    sp.MaSanPham, sp.TenSanPham, sp.Slug, sp.GiaGoc, dm.TenDanhMuc,
+    img.UrlAnh AS AnhChinh
+FROM dbo.SanPham sp
+JOIN dbo.DanhMuc dm ON dm.MaDanhMuc = sp.MaDanhMuc
+OUTER APPLY (
+    SELECT TOP 1 UrlAnh
+    FROM dbo.AnhSanPham a
+    WHERE a.MaSanPham = sp.MaSanPham AND a.AnhChinh = 1
+    ORDER BY a.ThuTu ASC
+) img
+ORDER BY sp.MaSanPham DESC;
+GO
