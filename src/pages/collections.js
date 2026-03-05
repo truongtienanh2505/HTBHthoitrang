@@ -1,6 +1,6 @@
-import { mountLayout, productCardHtml } from "../components.js";
-import { listCategories, listProducts } from "../api.js";
-import { $, money } from "../utils.js";
+import { mountLayout, productCardHtml } from "./components.js";
+import { listCategories, listProducts } from "./api.js";
+import { $, money } from "./utils.js";
 
 await mountLayout({ active: "collections" });
 

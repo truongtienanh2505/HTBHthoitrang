@@ -1,5 +1,5 @@
-import { mountLayout } from "../components.js";
-import { $, toast } from "../utils.js";
+import { mountLayout } from "./components.js";
+import { $, toast } from "./utils.js";
 
 await mountLayout({ active: "contact" });
 

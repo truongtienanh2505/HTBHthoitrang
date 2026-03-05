@@ -1,11 +1,12 @@
-import { mountLayout } from "../components.js";
-import { getProductDetail } from "../api.js";
-import { $, $$, money, getQuery, toast } from "../utils.js";
+import { mountLayout } from "./components.js";
+import { getProductDetail, getProductReviews, submitReview } from "./api.js";
+import { $, $$, money, getQuery, toast } from "./utils.js";
 
 await mountLayout({ active: "" });
 
 // 1. Lấy ID sản phẩm từ URL (VD: product.html?id=1)
 const { id } = getQuery();
+const productId = id; // Dùng chung cho Review
 
 let currentProduct = null;
 let currentVariants = [];
@@ -28,26 +29,19 @@ async function init() {
 }
 
 function renderUI({ product, variants, images }) {
-    // Render thông tin cơ bản
     $("#title").innerText = product.TenSanPham;
     $("#priceNow").innerText = money(product.GiaGoc);
     $("#sku").innerText = product.Slug || "--";
-    $("#stock").innerText = "Còn hàng"; // Có thể tính tổng tồn kho từ variants sau
+    $("#stock").innerText = "Còn hàng"; 
     $("#paneDesc").innerHTML = product.MoTa || "Đang cập nhật mô tả...";
     
-    // Render Ảnh
     if (images && images.length > 0) {
         $("#galleryMain").innerHTML = `<img src="${images[0].UrlAnh}" alt="main" style="width:100%; border-radius:8px" />`;
     }
 
-    // Render Nút chọn Màu (Lọc ra các màu không trùng lặp)
     const colors = [...new Map(variants.map(v => [v.MaMauSac, { id: v.MaMauSac, name: v.TenMau, hex: v.MaHex }])).values()];
-    
-    // Render Nút chọn Size (Lọc ra các size không trùng lặp)
     const sizes = [...new Map(variants.map(v => [v.MaKichCo, { id: v.MaKichCo, name: v.TenKichCo }])).values()];
 
-    // Tìm thẻ chứa Màu và Size (Dựa theo HTML của bạn)
-    // Giả sử HTML của bạn có 2 div kế tiếp chữ "Màu" và "Kích cỡ", ta sẽ render động vào đó:
     const labels = $$('.label');
     let colorContainer = null;
     let sizeContainer = null;
@@ -75,7 +69,6 @@ function renderUI({ product, variants, images }) {
 }
 
 function attachEvents() {
-    // Sự kiện tăng giảm số lượng
     const qtyInput = $("#qtyInput");
     $("#btnMinus")?.addEventListener("click", () => {
         let val = parseInt(qtyInput.value) || 1;
@@ -86,33 +79,28 @@ function attachEvents() {
         qtyInput.value = val + 1;
     });
 
-    // Sự kiện chọn Màu
     $$(".variant-color").forEach(btn => {
         btn.addEventListener("click", (e) => {
             $$(".variant-color").forEach(b => b.classList.remove("btn--primary"));
             $$(".variant-color").forEach(b => b.classList.add("btn--ghost"));
             btn.classList.remove("btn--ghost");
             btn.classList.add("btn--primary");
-            
             selectedColor = parseInt(btn.dataset.id);
             updatePrice();
         });
     });
 
-    // Sự kiện chọn Size
     $$(".variant-size").forEach(btn => {
         btn.addEventListener("click", (e) => {
             $$(".variant-size").forEach(b => b.classList.remove("btn--primary"));
             $$(".variant-size").forEach(b => b.classList.add("btn--ghost"));
             btn.classList.remove("btn--ghost");
             btn.classList.add("btn--primary");
-            
             selectedSize = parseInt(btn.dataset.id);
             updatePrice();
         });
     });
 
-    // Nút Thêm vào giỏ
     $("#btnAdd")?.addEventListener("click", () => {
         if (currentVariants.length > 0 && (!selectedColor || !selectedSize)) {
             return toast("Vui lòng chọn đầy đủ Màu sắc và Kích cỡ!");
@@ -123,12 +111,9 @@ function attachEvents() {
 
 function updatePrice() {
     if (!selectedColor || !selectedSize) return;
-    
-    // Tìm biến thể khớp với Màu và Size đã chọn
     const variant = currentVariants.find(v => v.MaMauSac === selectedColor && v.MaKichCo === selectedSize);
     
     if (variant) {
-        // Nếu biến thể có cài đặt giá riêng (hoặc cộng thêm tiền)
         const finalPrice = currentProduct.GiaGoc + (variant.DieuChinhGia || 0);
         $("#priceNow").innerText = money(finalPrice);
         $("#stock").innerText = `Còn ${variant.SoLuongTon || 0} sản phẩm`;
@@ -136,5 +121,70 @@ function updatePrice() {
         $("#stock").innerText = "Hết hàng phiên bản này";
     }
 }
+
+// ==========================================
+// XỬ LÝ TAB MÔ TẢ & ĐÁNH GIÁ (TUẦN 4)
+// ==========================================
+$$(".tab").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+        $$(".tab").forEach(b => b.style.fontWeight = "normal");
+        $$(".pane").forEach(p => p.style.display = "none");
+        
+        e.target.style.fontWeight = "bold";
+        const tabId = e.target.getAttribute("data-tab");
+        
+        if (tabId === "desc") $("#tabDesc").style.display = "block";
+        if (tabId === "reviews") {
+            $("#tabReviews").style.display = "block";
+            loadReviews(); 
+        }
+    });
+});
+
+async function loadReviews() {
+    if (!productId) return;
+    const reviews = await getProductReviews(productId);
+    const listEl = $("#reviewList");
+    
+    if (reviews.length === 0) {
+        listEl.innerHTML = "<div class='smallhint'>Chưa có đánh giá nào. Hãy là người đầu tiên!</div>";
+        return;
+    }
+
+    listEl.innerHTML = reviews.map(r => `
+        <div style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between;">
+                <b>${r.ReviewerName}</b>
+                <span style="color: #f39c12;">${'★'.repeat(r.Rating)}${'☆'.repeat(5 - r.Rating)}</span>
+            </div>
+            <div style="margin-top: 5px;">${r.Content}</div>
+            <div class="smallhint" style="margin-top: 5px; font-size: 12px;">${new Date(r.CreatedAt).toLocaleString('vi-VN')}</div>
+        </div>
+    `).join('');
+}
+
+$("#btnSubmitReview")?.addEventListener("click", async () => {
+    if (!productId) return toast("Lỗi: Không xác định được sản phẩm!");
+
+    const payload = {
+        ProductId: parseInt(productId),
+        Rating: parseInt($("#reviewStar").value),
+        Content: $("#reviewContent").value.trim()
+    };
+
+    if (!payload.Content) return toast("Vui lòng nhập nội dung đánh giá!");
+    if (payload.Rating < 1 || payload.Rating > 5) return toast("Số sao phải từ 1 đến 5!");
+
+    const res = await submitReview(payload);
+    
+    if (res.success) {
+        toast("Đánh giá thành công! ✅");
+        $("#reviewContent").value = ""; 
+        $("#reviewStar").value = "5";
+        loadReviews(); 
+    } else {
+        toast("Lỗi: " + res.message + " ❌");
+    }
+});
 
 init();

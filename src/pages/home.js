@@ -1,6 +1,6 @@
-import { mountLayout, productCardHtml } from "../components.js";
-import { getBanners, listCategories, listProducts } from "../api.js";
-import { $, money, toast } from "../utils.js";
+import { mountLayout, productCardHtml } from "./components.js";
+import { getBanners, listCategories, listProducts } from "./api.js";
+import { $, money, toast } from "./utils.js";
 
 await mountLayout({ active: "home" });
 
