@@ -13,4 +13,7 @@ public interface IProductRepository
     Task<bool> UpdateStockAsync(int variantId, int quantityChange);
     Task<bool> UpdateStockAfterSale(int variantId, int quantitySold);
     Task<bool> UpdateStock(int variantId, int quantity);
+    
+    Task<Product> GetByVariantIdAsync(int variantId);
+    Task<ProductVariant?> GetProductVariantById(int id);
 }

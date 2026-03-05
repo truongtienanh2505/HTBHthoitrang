@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Shop.Application.Products;
+using Shop.Infrastructure.Products;
 using Shop.Infrastructure.Persistence;
 
 namespace Shop.Infrastructure.Products;
@@ -7,6 +8,7 @@ namespace Shop.Infrastructure.Products;
 public class ProductRepository : IProductRepository
 {
     private readonly ShopDbContext _context;
+    
 
     public ProductRepository(ShopDbContext context)
     {
@@ -91,5 +93,22 @@ public class ProductRepository : IProductRepository
         return await _context.SaveChangesAsync() > 0;
         
     }   
-    
+   public async Task<ProductVariant?> GetProductVariantById(int id)
+{
+    return await _context.ProductVariants
+        .FirstOrDefaultAsync(v => v.MaBienThe == id);
+}
+public async Task<Product?> GetByVariantIdAsync(int variantId)
+{
+    var variant = await _context.ProductVariants
+        .Include(v => v.Product)
+        .FirstOrDefaultAsync(v => v.ProductVariantId == variantId);
+
+    if (variant == null)
+    {
+        return null;
+    }
+
+    return variant.Product;
+}
 }

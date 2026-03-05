@@ -1,13 +1,18 @@
 using Shop.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Shop.Application.Models;
+using Shop.Application.Products;
 namespace Shop.Infrastructure.Services;
 
 public class CheckoutService
 {
     private readonly ShopDbContext _context;
-
-    public CheckoutService(ShopDbContext context)
+    private readonly IProductRepository _productRepository;  
+    public CheckoutService(
+        IProductRepository productRepository,
+        ShopDbContext context)
     {
+        _productRepository = productRepository;
         _context = context;
     }
 
@@ -31,6 +36,7 @@ public class CheckoutService
 
             foreach (var item in request.Items)
             {
+                
                 var variant = await _context.ProductVariants
                     .FirstOrDefaultAsync(x => x.ProductVariantId == item.ProductVariantId);
 
@@ -69,4 +75,38 @@ public class CheckoutService
             throw;
         }
     }
+      public async Task<string> ValidateCart(List<CartItem> cartItems)
+        {
+            if (cartItems == null || cartItems.Count == 0)
+            {
+                return "Giỏ hàng trống";
+            }
+
+            foreach (var item in cartItems)
+            {
+                var variant = await _productRepository.GetProductVariantById(item.ProductVariantId);
+
+                if (variant == null)
+                {
+                    return $"Sản phẩm {item.ProductVariantId} không tồn tại";
+                }
+
+                if (!variant.HoatDong)
+                {
+                    return "Sản phẩm hiện không còn bán";
+                }
+
+                if (item.Quantity <= 0)
+                {
+                    return "Số lượng không hợp lệ";
+                }
+
+                if (item.Quantity > variant.SoLuongTon)
+                {
+                    return $"Sản phẩm {variant.Sku} không đủ tồn kho";
+                }
+            }
+
+            return "Valid";
+        }
 }

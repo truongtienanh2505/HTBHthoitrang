@@ -50,15 +50,17 @@ namespace Shop.Infrastructure.Repositories
                 .Select(x => x.KhuyenMai)
                 .FirstOrDefaultAsync();
         }
-        public async Task<List<KhuyenMai>> GetActivePromotionsAsync(int productId, DateTime now)
+       public async Task<List<KhuyenMai>> GetActivePromotionsAsync(int productId, DateTime now)
 {
     return await _context.SanPhamKhuyenMais
-        .Where(spkm => spkm.MaSanPham == productId 
-            && spkm.KhuyenMai.NgayBatDau <= now 
-            && spkm.KhuyenMai.NgayKetThuc >= now 
-            && spkm.KhuyenMai.KichHoat == true)
-        .Select(spkm => spkm.KhuyenMai)
-        .ToListAsync(); // Lấy tất cả, không dùng FirstOrDefault để tránh lỗi trùng
+        .Include(x => x.KhuyenMai)
+        .Where(x => x.MaSanPham == productId
+            && x.KhuyenMai != null
+            && x.KhuyenMai.KichHoat
+            && x.KhuyenMai.NgayBatDau <= now
+            && x.KhuyenMai.NgayKetThuc >= now)
+        .Select(x => x.KhuyenMai!)
+        .ToListAsync();
 }
 
         public async Task SaveChangesAsync()

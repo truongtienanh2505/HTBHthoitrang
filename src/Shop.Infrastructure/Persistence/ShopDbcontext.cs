@@ -1,19 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using Shop.Application.Categories.Models;
 using Shop.Application.Products;
+using Shop.Infrastructure.Products;
 namespace Shop.Infrastructure.Persistence;
 
 public class ShopDbContext : DbContext
 {
     // Trong class ShopDbContext
     public DbSet<KhuyenMai> KhuyenMais => Set<KhuyenMai>();
+    
     public DbSet<SanPhamKhuyenMai> SanPhamKhuyenMais => Set<SanPhamKhuyenMai>();
+     public DbSet<SanPham> SanPhams { get; set; }
     public DbSet<DanhMuc> DanhMucs { get; set; } = null!;
-    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Product> Products { get; set; } 
+    public DbSet<ProductVariant> ProductVariants { get; set; }
     public DbSet<Order> Orders { get; set; }
 
     public DbSet<OrderItem> OrderItems { get; set; }
-    public DbSet<ProductVariant> ProductVariants { get; set; } = null!;
     public DbSet<ProductVariant> BienTheSanPhams { get; set; }
     public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options) { }
 

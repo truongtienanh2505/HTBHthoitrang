@@ -1,11 +1,12 @@
 using Shop.Application.Interfaces;
-
+using Shop.Application.Models;
+using Shop.Application.Products;
 namespace Shop.Application.Services
 {
     public class PromotionService
     {
         private readonly IPromotionRepository _repository;
-
+        private readonly IProductRepository _productRepository;
         public PromotionService(IPromotionRepository repository)
         {
             _repository = repository;
@@ -57,5 +58,25 @@ namespace Shop.Application.Services
 
             return Math.Max(finalPrice, 0);
         }
+    public async Task<decimal> CalculateCartTotal(List<CartItem> cartItems)
+{
+    decimal total = 0;
+
+    foreach (var item in cartItems)
+    {
+        var product = await _productRepository.GetByVariantIdAsync(item.ProductVariantId);
+
+        if (product == null)    
+            throw new Exception("Sản phẩm không tồn tại");
+
+        // Giá gốc
+        var originalPrice = product.Price;
+
+        // Giá sau khuyến mãi
+       var price = await CalculateDiscountedPrice(product.Id, product.Price);
+    }
+
+    return total;
+}
     }
 }

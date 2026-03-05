@@ -1,6 +1,9 @@
-public class CartItem
+namespace Shop.Application.Models
 {
-    public int ProductVariantId { get; set; }
+    public class CartItem
+    {
+        public int ProductVariantId { get; set; }
 
-    public int Quantity { get; set; }
+        public int Quantity { get; set; }
+    }
 }

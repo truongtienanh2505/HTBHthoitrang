@@ -36,5 +36,17 @@ namespace Shop.Api.Controllers
                 });
             }
         }
-    }
+        [HttpPost("validate-cart")]
+        public async Task<IActionResult> ValidateCart([FromBody] List<CartItem> cart)
+        {
+            var result = await _checkoutService.ValidateCart(cart);
+
+            if (result != "Valid")
+            {
+                return BadRequest(result);
+            }
+
+            return Ok("Giỏ hàng hợp lệ");
+        }
+            }
 }
