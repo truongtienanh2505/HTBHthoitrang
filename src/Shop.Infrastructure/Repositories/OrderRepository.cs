@@ -36,7 +36,7 @@ namespace Shop.Infrastructure.Repositories
         public async Task<Product?> GetProductForUpdateAsync(int productId)
         {
             return await _context.Products
-                .FirstOrDefaultAsync(p => p.Id == productId);
+                .FirstOrDefaultAsync(p => p.MaSanPham == productId);
         }
 
         public async Task<KhuyenMai?> GetActivePromotionAsync(int productId, DateTime now)
@@ -45,23 +45,24 @@ namespace Shop.Infrastructure.Repositories
                 .Include(x => x.KhuyenMai)
                 .Where(x => x.MaSanPham == productId
                             && x.KhuyenMai.KichHoat
-                            && x.KhuyenMai.NgayBatDau <= now
-                            && x.KhuyenMai.NgayKetThuc >= now)
+                            && x.KhuyenMai.BatDau <= now
+                            && x.KhuyenMai.KetThuc >= now)
                 .Select(x => x.KhuyenMai)
                 .FirstOrDefaultAsync();
         }
-       public async Task<List<KhuyenMai>> GetActivePromotionsAsync(int productId, DateTime now)
-{
-    return await _context.SanPhamKhuyenMais
-        .Include(x => x.KhuyenMai)
-        .Where(x => x.MaSanPham == productId
-            && x.KhuyenMai != null
-            && x.KhuyenMai.KichHoat
-            && x.KhuyenMai.NgayBatDau <= now
-            && x.KhuyenMai.NgayKetThuc >= now)
-        .Select(x => x.KhuyenMai!)
-        .ToListAsync();
-}
+
+        public async Task<List<KhuyenMai>> GetActivePromotionsAsync(int productId, DateTime now)
+        {
+            return await _context.SanPhamKhuyenMais
+                .Include(x => x.KhuyenMai)
+                .Where(x => x.MaSanPham == productId
+                    && x.KhuyenMai != null
+                    && x.KhuyenMai.KichHoat
+                    && x.KhuyenMai.BatDau <= now
+                    && x.KhuyenMai.KetThuc >= now)
+                .Select(x => x.KhuyenMai!)
+                .ToListAsync();
+        }
 
         public async Task SaveChangesAsync()
         {

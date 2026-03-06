@@ -8,9 +8,12 @@ namespace Shop.Application.Products
     public class ProductVariant
     {
         [Key]
+        [Column("MaBienThe")]
            public int ProductVariantId { get; set; }
+        [Column("MaSanPham")]
         public int ProductId { get; set; }
         public decimal Price { get; set; }
+        [Column("SoLuongTon")]
         public int Stock { get; set; }
         public int MaBienThe { get; set; }
          public int MaSanPham { get; set; }

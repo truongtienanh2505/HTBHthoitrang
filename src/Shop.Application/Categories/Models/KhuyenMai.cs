@@ -1,8 +1,6 @@
 using Shop.Application.Categories.Models;
 public class KhuyenMai
 {
-    public DateTime NgayBatDau { get; set; }
-    public DateTime NgayKetThuc { get; set; }
     public int MaKhuyenMai { get; set; }
     public string TenKhuyenMai { get; set; } = null!;
     public string LoaiGiamGia { get; set; } = null!; // FIXED_AMOUNT hoặc PERCENTAGE

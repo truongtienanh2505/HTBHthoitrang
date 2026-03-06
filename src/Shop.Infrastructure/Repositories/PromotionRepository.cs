@@ -20,8 +20,8 @@ public class PromotionRepository : IPromotionRepository
                 spkm.MaSanPham == productId &&
                 spkm.KhuyenMai != null &&
                 spkm.KhuyenMai.KichHoat &&
-                spkm.KhuyenMai.NgayBatDau <= now &&
-                spkm.KhuyenMai.NgayKetThuc >= now
+                spkm.KhuyenMai.BatDau <= now &&
+                spkm.KhuyenMai.KetThuc >= now
             )
             .Select(spkm => spkm.KhuyenMai!)
             .ToListAsync();

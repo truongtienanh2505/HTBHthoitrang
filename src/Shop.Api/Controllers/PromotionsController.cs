@@ -42,10 +42,10 @@ public async Task<IActionResult> Create(PromotionRequest request)
         LoaiGiamGia = request.LoaiGiamGia,
         GiaTriGiam = request.GiaTriGiam,
         KichHoat = request.KichHoat,
-        // Gán dữ liệu ngày tháng tại đây
-        NgayBatDau = request.NgayBatDau, 
-        NgayKetThuc = request.NgayKetThuc,
-        
+
+        BatDau = request.BatDau,
+        KetThuc = request.KetThuc,
+
         SanPhamKhuyenMais = request.DanhSachMaSanPham.Select(id => new SanPhamKhuyenMai
         {
             MaSanPham = id
@@ -53,7 +53,8 @@ public async Task<IActionResult> Create(PromotionRequest request)
     };
 
     _context.KhuyenMais.Add(newPromo);
-    await _context.SaveChangesAsync(); // Lỗi 500 xảy ra tại dòng này nếu ngày sai
+    await _context.SaveChangesAsync();
+
     return Ok(newPromo);
 }
 [HttpPut("{id}")]
@@ -62,11 +63,10 @@ public async Task<IActionResult> Update(int id, PromotionRequest request)
     var promo = await _context.KhuyenMais.FindAsync(id);
     if (promo == null) return NotFound();
 
-    // Cập nhật thông tin mới từ request
     promo.TenKhuyenMai = request.TenKhuyenMai;
     promo.GiaTriGiam = request.GiaTriGiam;
-    promo.NgayBatDau = request.NgayBatDau;
-    promo.NgayKetThuc = request.NgayKetThuc;
+    promo.BatDau = request.BatDau;
+    promo.KetThuc = request.KetThuc;
     promo.KichHoat = request.KichHoat;
 
     await _context.SaveChangesAsync();

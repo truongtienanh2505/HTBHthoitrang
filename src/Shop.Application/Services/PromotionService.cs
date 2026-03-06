@@ -1,6 +1,7 @@
 using Shop.Application.Interfaces;
 using Shop.Application.Models;
 using Shop.Application.Products;
+
 namespace Shop.Application.Services
 {
     public class PromotionService
@@ -73,7 +74,7 @@ namespace Shop.Application.Services
         var originalPrice = product.Price;
 
         // Giá sau khuyến mãi
-       var price = await CalculateDiscountedPrice(product.Id, product.Price);
+       var price = await CalculateDiscountedPrice(product.MaSanPham, product.Price);
     }
 
     return total;

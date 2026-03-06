@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Shop.Application.Categories.Models;
 using Shop.Application.Products;
 using Shop.Infrastructure.Products;
+using Shop.Application.Models;
 namespace Shop.Infrastructure.Persistence;
 
 public class ShopDbContext : DbContext
@@ -15,7 +16,7 @@ public class ShopDbContext : DbContext
     public DbSet<Product> Products { get; set; } 
     public DbSet<ProductVariant> ProductVariants { get; set; }
     public DbSet<Order> Orders { get; set; }
-
+    public DbSet<Promotion> Promotions { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<ProductVariant> BienTheSanPhams { get; set; }
     public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options) { }

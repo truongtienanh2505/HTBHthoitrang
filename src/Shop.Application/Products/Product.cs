@@ -4,14 +4,11 @@ using Shop.Application.Categories.Models;
 
 namespace Shop.Application.Products
 {
-    [Table("SanPham")] // Mapping với tên bảng trong SQL
+    [Table("SanPham")]
     public class Product
     {
         [Key]
-        public int Id { get; set; }
-        public decimal Price { get; set; }  
 
-        public int Stock { get; set; }       
         public int MaSanPham { get; set; }
 
         [Required, MaxLength(200)]
@@ -22,8 +19,13 @@ namespace Shop.Application.Products
 
         public string? MoTa { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")] // Khớp với kiểu decimal trong SQL
+        [Column(TypeName = "decimal(18,2)")]
         public decimal GiaGoc { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Price { get; set; }
+
+        public int Stock { get; set; }
 
         public int MaDanhMuc { get; set; }
 
@@ -34,11 +36,9 @@ namespace Shop.Application.Products
         public DateTime TaoLuc { get; set; } = DateTime.UtcNow;
         public DateTime? CapNhatLuc { get; set; }
 
-        // Quan hệ với DanhMuc
         [ForeignKey("MaDanhMuc")]
-        public virtual DanhMuc? DanhMuc { get; set; } //= null!;
+        public virtual DanhMuc? DanhMuc { get; set; }
 
-        // Quan hệ với các biến thể
         public virtual ICollection<ProductVariant>? BienThes { get; set; } = new List<ProductVariant>();
     }
 }
