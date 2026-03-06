@@ -22,6 +22,7 @@ public static class DependencyInjection
 
         services.AddScoped<Shop.Infrastructure.Search.SearchService>();
 
+        services.AddScoped<Shop.Infrastructure.Orders.OrderService>();
         return services;
     }
 }

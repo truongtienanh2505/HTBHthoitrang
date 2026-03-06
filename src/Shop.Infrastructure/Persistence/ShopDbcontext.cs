@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Shop.Application.Categories.Models;
 using Shop.Application.Auth.Models; 
 using Shop.Application.Products.Models;
+using Shop.Application.Orders.Models;
 
 namespace Shop.Infrastructure.Persistence;
 
@@ -12,10 +13,12 @@ public class ShopDbContext : DbContext
     public DbSet<DanhMuc> DanhMucs => Set<DanhMuc>();
     public DbSet<DanhMucTreeRow> DanhMucTreeRows => Set<DanhMucTreeRow>();
     
-    // Đã thêm bảng NguoiDung
+    public DbSet<SanPham> SanPhams => Set<SanPham>();
+    
     public DbSet<NguoiDung> NguoiDungs => Set<NguoiDung>(); 
 
-    public DbSet<SanPham> SanPhams => Set<SanPham>();
+    public DbSet<DonHang> DonHangs => Set<DonHang>();
+    public DbSet<LichSuDonHang> LichSuDonHangs => Set<LichSuDonHang>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
