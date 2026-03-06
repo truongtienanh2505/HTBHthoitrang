@@ -1,3 +1,5 @@
+using Shop.Application.Auth; 
+using Shop.Infrastructure.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,8 @@ public static class DependencyInjection
             opt.UseSqlServer(configuration.GetConnectionString("Default")));
 
         services.AddScoped<IDanhMucRepository, DanhMucRepository>();
+
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

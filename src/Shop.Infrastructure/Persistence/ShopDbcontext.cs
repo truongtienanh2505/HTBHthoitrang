@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Shop.Application.Categories.Models;
+using Shop.Application.Auth.Models; 
 
 namespace Shop.Infrastructure.Persistence;
 
@@ -9,6 +10,9 @@ public class ShopDbContext : DbContext
 
     public DbSet<DanhMuc> DanhMucs => Set<DanhMuc>();
     public DbSet<DanhMucTreeRow> DanhMucTreeRows => Set<DanhMucTreeRow>();
+    
+    // Đã thêm bảng NguoiDung
+    public DbSet<NguoiDung> NguoiDungs => Set<NguoiDung>(); 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,6 +37,14 @@ public class ShopDbContext : DbContext
         {
             e.HasNoKey();
             e.ToView(null);
+        });
+
+        // Cấu hình bảng NguoiDung
+        modelBuilder.Entity<NguoiDung>(e =>
+        {
+            e.ToTable("NguoiDung", "dbo");
+            e.HasKey(x => x.MaNguoiDung);
+            e.HasIndex(x => x.Email).IsUnique();
         });
     }
 }
