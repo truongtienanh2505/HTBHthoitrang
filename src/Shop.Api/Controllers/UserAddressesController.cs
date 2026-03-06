@@ -1,55 +1,58 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Shop.Application.UserAddresses;
 
-namespace Shop.Api.Controllers
+namespace Shop.Api.Controllers;
+
+[ApiController]
+[Route("api/user-addresses")]
+public class UserAddressesController : ControllerBase
 {
-    [ApiController]
-    [Route("api/user-addresses")]
-    public class UserAddressesController : ControllerBase
+    private readonly UserAddressService _service;
+
+    public UserAddressesController(UserAddressService service)
     {
-        private readonly string _connectionString;
+        _service = service;
+    }
 
-        public UserAddressesController(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("Default");
-        }
+    [HttpGet]
+    public async Task<IActionResult> GetAddresses()
+    {
+        int userId = 1; // Tạm fix cứng
+        var list = await _service.GetAddressesAsync(userId);
+        return Ok(list);
+    }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAddresses()
-        {
-            int userId = 1; // Mặc định User ID = 1 để test
-            using var conn = new SqlConnection(_connectionString);
-            await conn.OpenAsync();
-            
-            var query = @"
-                SELECT MaDiaChi, TenLienHe, DienThoaiLienHe, DiaChi, TinhThanh, QuanHuyen, PhuongXa, MacDinh 
-                FROM DiaChiNguoiDung 
-                WHERE MaNguoiDung = @UserId 
-                ORDER BY MacDinh DESC";
-                
-            using var cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@UserId", userId);
-            
-            var list = new List<object>();
-            using var reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                list.Add(new {
-                    id = reader["MaDiaChi"],
-                    contactName = reader["TenLienHe"].ToString(),
-                    contactPhone = reader["DienThoaiLienHe"].ToString(),
-                    addressLine = reader["DiaChi"].ToString(),
-                    province = reader["TinhThanh"].ToString(),
-                    district = reader["QuanHuyen"].ToString(),
-                    ward = reader["PhuongXa"].ToString(),
-                    isDefault = Convert.ToBoolean(reader["MacDinh"])
-                });
-            }
-            return Ok(list);
+    [HttpPost]
+    public async Task<IActionResult> CreateAddress([FromBody] AddressDto dto)
+    {
+        int userId = 1;
+        try {
+            await _service.CreateAddressAsync(userId, dto);
+            return Ok(new { message = "Thêm địa chỉ thành công!" });
+        } catch(Exception ex) {
+            return StatusCode(500, new { message = "Lỗi server: " + ex.Message });
         }
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateAddress(int id, [FromBody] AddressDto dto)
+    {
+        int userId = 1;
+        try {
+            bool success = await _service.UpdateAddressAsync(id, userId, dto);
+            if (!success) return NotFound(new { message = "Không tìm thấy địa chỉ của bạn!" });
+            return Ok(new { message = "Cập nhật địa chỉ thành công!" });
+        } catch(Exception ex) {
+            return StatusCode(500, new { message = "Lỗi server: " + ex.Message });
+        }
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteAddress(int id)
+    {
+        int userId = 1;
+        bool success = await _service.DeleteAddressAsync(id, userId);
+        if (!success) return NotFound(new { message = "Không tìm thấy địa chỉ để xóa!" });
+        return Ok(new { message = "Xóa địa chỉ thành công!" });
     }
 }

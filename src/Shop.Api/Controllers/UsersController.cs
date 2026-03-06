@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Security.Claims;
 
 namespace Shop.Api.Controllers;
 
@@ -11,20 +13,16 @@ public class UsersController : ControllerBase
     public UsersController(IConfiguration config) => _connStr = config.GetConnectionString("Default");
 
     [HttpGet("me")]
-    // [Authorize] // TODO CHO NHÓM: Bỏ comment dòng này khi đã cài đặt JWT Authentication
+    [Authorize] // BẬT BẢO MẬT: Phải có Token mới được vào!
     public async Task<IActionResult> GetMe()
     {
-        // ==========================================
-        // [TODO CHO NHÓM]: LẤY ID TỪ JWT TOKEN
-        // ==========================================
-        // Khi làm xong chức năng Đăng nhập, hãy mở comment 2 dòng dưới đây
-        // và xóa dòng "int userId = 1;" đi nhé!
+        // 1. Lấy ID từ JWT Token
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null) return Unauthorized(new { message = "Token không hợp lệ hoặc bị thiếu!" });
         
-        // var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-        // int userId = int.Parse(userIdClaim.Value);
-        
-        int userId = 1; // Tạm thời Fix cứng ID = 1 để test giao diện trước
+        int userId = int.Parse(userIdClaim.Value);
 
+        // 2. Lấy thông tin từ DB dựa vào ID vừa giải mã
         using var conn = new SqlConnection(_connStr);
         await conn.OpenAsync();
         

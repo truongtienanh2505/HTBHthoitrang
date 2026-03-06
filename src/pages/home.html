@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Cửa Hàng Thời Trang</title>
+    
+    <link rel="stylesheet" href="../assets/styles.css" /></head>
+</head>
+<body>
+
+    <div id="layout-header-placeholder"></div>
+
+    <main class="container layout">
+        
+        <div id="bannerWrap" class="section">
+            <div style="text-align: center; padding: 40px; color: var(--muted);">
+                Đang tải dữ liệu...
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section__head">
+                <h2>Danh mục mua sắm</h2>
+            </div>
+            <div id="quickCats" class="qcats"></div>
+        </section>
+
+        <section class="section">
+            <div class="section__head">
+                <h2>Sản Phẩm Nổi Bật</h2>
+                <div class="section__tools">
+                    <a href="products.html" class="link">Xem tất cả &rarr;</a>
+                </div>
+            </div>
+            <div id="gridFeatured" class="grid"></div>
+        </section>
+
+        <section class="section">
+            <div class="section__head">
+                <h2><span class="tag hot">HOT</span> Bán Chạy Nhất</h2>
+                <div class="section__tools">
+                    <a href="products.html?sort=best" class="link">Khám phá</a>
+                </div>
+            </div>
+            <div id="gridBest" class="grid"></div>
+        </section>
+
+        <section class="section">
+            <div class="section__head">
+                <h2><span class="tag sale">SALE</span> Đang Giảm Giá</h2>
+                <div class="section__tools">
+                    <a href="products.html?sort=sale" class="link">Săn deal</a>
+                </div>
+            </div>
+            <div id="gridSale" class="grid"></div>
+        </section>
+
+        <section class="hero" style="display: block; text-align: center; margin-top: 40px; padding: 40px 20px;">
+            <h2 style="margin-bottom: 12px; font-size: 28px;">Bạn đã sẵn sàng thay đổi phong cách?</h2>
+            <p class="muted" style="margin-bottom: 24px; font-size: 16px;">Khám phá hàng trăm mẫu thiết kế độc quyền với giá cực kỳ ưu đãi.</p>
+            <button id="btnGotoProducts" class="btn btn--primary" style="margin: 0 auto; padding: 12px 30px; font-size: 16px;">
+                Mua Sắm Ngay
+            </button>
+        </section>
+
+    </main>
+
+    <div id="layout-footer-placeholder"></div>
+
+    <script type="module" src="home.js"></script>
+</body>
+</html>
