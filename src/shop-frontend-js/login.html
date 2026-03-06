@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 50px; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold;}
+        button:hover { background-color: #0069d9; }
+        .divider { text-align: center; margin: 20px 0; color: #888; font-size: 14px; }
+        .link { display: block; text-align: center; margin-top: 15px; color: #007bff; text-decoration: none; }
+        .google-btn-wrapper { display: flex; justify-content: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align: center;">Đăng Nhập</h2>
+    
+    <form onsubmit="handleBasicLogin(event)">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Mật khẩu" required>
+        <button type="submit">Đăng Nhập</button>
+    </form>
+
+    <div class="divider">HOẶC</div>
+
+    <div class="google-btn-wrapper">
+        <div id="g_id_onload"
+             data-client_id="THAY_MÃ_CLIENT_ID_CỦA_BẠN_VÀO_ĐÂY.apps.googleusercontent.com"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleGoogleResponse"
+             data-auto_prompt="false">
+        </div>
+
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="signin_with"
+             data-size="large"
+             data-logo_alignment="left">
+        </div>
+    </div>
+
+    <a href="register.html" class="link">Chưa có tài khoản? Đăng ký mới</a>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="auth.js"></script>
+
+</body>
+</html>
