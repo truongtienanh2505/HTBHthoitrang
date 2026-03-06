@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shop.Application.Categories.Models;
 using Shop.Application.Auth.Models; 
+using Shop.Application.Products.Models;
 
 namespace Shop.Infrastructure.Persistence;
 
@@ -14,6 +15,8 @@ public class ShopDbContext : DbContext
     // Đã thêm bảng NguoiDung
     public DbSet<NguoiDung> NguoiDungs => Set<NguoiDung>(); 
 
+    public DbSet<SanPham> SanPhams => Set<SanPham>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<DanhMuc>(e =>

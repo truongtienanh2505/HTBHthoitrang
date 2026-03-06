@@ -20,6 +20,8 @@ public static class DependencyInjection
 
         services.AddScoped<IAuthService, AuthService>();
 
+        services.AddScoped<Shop.Infrastructure.Search.SearchService>();
+
         return services;
     }
 }
