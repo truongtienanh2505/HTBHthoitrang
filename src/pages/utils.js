@@ -12,7 +12,16 @@ export const getQuery = () => {
     const params = new URLSearchParams(window.location.search);
     return Object.fromEntries(params.entries());
 };
-
+export const setQuery = (obj) => {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined && value !== null && value !== "") {
+        params.set(key, value);
+      }
+    }
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.pushState({}, "", newUrl);
+  };
 // Hàm hiển thị thông báo góc màn hình
 export const toast = (message) => {
     // Tạm thời dùng alert để chắc chắn không bị lỗi giao diện

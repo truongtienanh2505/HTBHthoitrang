@@ -8,7 +8,8 @@ async function render(){
   const banners = await getBanners();
   const cats = await listCategories();
   const prod = await listProducts({ sort: "featured", pageSize: 8, page: 1 });
-
+const newArrivals = await listProducts({ sort: "new", pageSize: 4, page: 1 });
+$("#gridNew").innerHTML = newArrivals.items.map(productCardHtml).join("");
   // Banner
   const b = banners[0];
   if(b){

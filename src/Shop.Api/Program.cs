@@ -12,7 +12,8 @@ using Shop.Application.UserAddresses;
 using Shop.Infrastructure.UserAddresses;
 using Shop.Application.Articles;
 using Shop.Infrastructure.Articles;
-
+using Shop.Application.Banners;
+using Shop.Infrastructure.Banners;
 var builder = WebApplication.CreateBuilder(args);
 // Cấp quyền CORS cho phép mọi Frontend đều được gọi vào Backend
 builder.Services.AddScoped<IUserAddressRepository, UserAddressRepository>();
@@ -23,6 +24,8 @@ builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
 builder.Services.AddScoped<ArticleService>();
+builder.Services.AddScoped<IBannerRepository, BannerRepository>();
+builder.Services.AddScoped<BannerService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -32,7 +35,11 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        // Ép C# giữ nguyên chữ viết Hoa (PascalCase) khi gửi xuống file JS
+        options.JsonSerializerOptions.PropertyNamingPolicy = null; 
+    });;
 
 // Swagger UI (Swashbuckle)
 builder.Services.AddEndpointsApiExplorer();

@@ -44,7 +44,7 @@ public class ProductRepository : IProductRepository
         // 2. Lấy dữ liệu theo trang (OFFSET FETCH)
         int offset = (page - 1) * pageSize;
         var cmdList = new SqlCommand($@"
-            SELECT MaSanPham, TenSanPham, Slug, GiaGoc 
+            SELECT MaSanPham, TenSanPham, Slug, GiaGoc, AnhDaiDien 
             FROM SanPham 
             {whereClause} 
             {orderBy} 
@@ -64,8 +64,7 @@ public class ProductRepository : IProductRepository
                 TenSanPham = reader["TenSanPham"].ToString(),
                 Slug = reader["Slug"].ToString(),
                 GiaGoc = reader["GiaGoc"],
-                // Thêm Ảnh đại diện nếu database bạn có cột UrlAnh
-                UrlAnh = "https://via.placeholder.com/300x300?text=SP" 
+                AnhDaiDien = reader["AnhDaiDien"].ToString() 
             });
         }
 
