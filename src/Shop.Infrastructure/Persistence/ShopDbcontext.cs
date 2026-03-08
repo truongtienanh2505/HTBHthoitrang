@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Shop.Application.Auth.Models;
 using Shop.Application.Categories.Models;
+using Shop.Application.Orders.Models;
+using Shop.Application.Products.Models;
 
 namespace Shop.Infrastructure.Persistence;
 
@@ -7,20 +10,21 @@ public class ShopDbContext : DbContext
 {
     public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options) { }
 
+    // Categories
     public DbSet<DanhMuc> DanhMucs => Set<DanhMuc>();
-
-    public DbSet<ProductCardRow> ProductCardRows => Set<ProductCardRow>();
     public DbSet<DanhMucTreeRow> DanhMucTreeRows => Set<DanhMucTreeRow>();
 
+    // Bản gốc HTBHthoitrang
+    public DbSet<ProductCardRow> ProductCardRows => Set<ProductCardRow>();
     public DbSet<PromotionCacheStatusRow> PromotionCacheStatusRows => Set<PromotionCacheStatusRow>();
-
-    public object RevenueByDayRows { get; internal set; }
-
     public DbSet<RevenueByDayRow> RevenueByDayRow => Set<RevenueByDayRow>();
-
     public DbSet<VoucherInspectRow> VoucherInspectRows => Set<VoucherInspectRow>();
 
-    public object VoucherInspectRow { get; internal set; }
+    // Kim Nghĩa
+    public DbSet<SanPham> SanPhams => Set<SanPham>();
+    public DbSet<NguoiDung> NguoiDungs => Set<NguoiDung>();
+    public DbSet<DonHang> DonHangs => Set<DonHang>();
+    public DbSet<LichSuDonHang> LichSuDonHangs => Set<LichSuDonHang>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,11 +50,13 @@ public class ShopDbContext : DbContext
             e.HasNoKey();
             e.ToView(null);
         });
+
         modelBuilder.Entity<PromotionCacheStatusRow>(e =>
         {
             e.HasNoKey();
             e.ToView(null);
         });
+
         modelBuilder.Entity<ProductCardRow>(e =>
         {
             e.HasNoKey();
@@ -64,9 +70,16 @@ public class ShopDbContext : DbContext
         });
 
         modelBuilder.Entity<VoucherInspectRow>(e =>
-        { 
+        {
             e.HasNoKey();
             e.ToView(null);
+        });
+
+        modelBuilder.Entity<NguoiDung>(e =>
+        {
+            e.ToTable("NguoiDung", "dbo");
+            e.HasKey(x => x.MaNguoiDung);
+            e.HasIndex(x => x.Email).IsUnique();
         });
     }
 }

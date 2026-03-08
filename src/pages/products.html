@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shop | Sản phẩm</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+</head>
+<body>
+  <div id="layoutTop"></div>
+  <main class="container layout">
+    
+    <div class="breadcrumbs">
+      <a href="index.html">Trang chủ</a><span>›</span><span>Sản phẩm</span>
+    </div>
+
+    <div class="page">
+      <aside class="panel">
+        <div class="panel__head">Bộ lọc</div>
+        <div class="panel__body">
+          <div class="field">
+            <label class="label">Tìm kiếm</label>
+            <input class="input" id="searchBox" placeholder="Tên sản phẩm..." />
+          </div>
+
+          <div class="field">
+            <label class="label">Danh mục</label>
+            <select class="select2" id="catSelect"></select>
+          </div>
+
+          <div class="field">
+            <label class="label">Sắp xếp</label>
+            <select class="select2" id="sortSelect2">
+              <option value="featured">Nổi bật</option>
+              <option value="new">Mới về</option>
+              <option value="best">Best seller</option>
+              <option value="sale">Sale trước</option>
+              <option value="price_asc">Giá tăng dần</option>
+              <option value="price_desc">Giá giảm dần</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label class="label">Min</label>
+              <input class="input" id="minPrice" placeholder="0" />
+            </div>
+            <div class="field">
+              <label class="label">Max</label>
+              <input class="input" id="maxPrice" placeholder="999999" />
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button class="btn btn--primary" id="btnApply">Áp dụng</button>
+            <button class="btn btn--ghost" id="btnReset">Reset</button>
+          </div>
+          <div class="smallhint">Tip: gõ Enter ở thanh search trên navbar để nhảy qua đây.</div>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <div class="panel__head" style="display:flex;justify-content:space-between;align-items:center">
+          <span>Kết quả</span>
+          <span class="smallhint" id="resultCount">0 sản phẩm</span>
+        </div>
+        <div class="panel__body">
+          <div class="grid" id="grid"></div>
+          <div id="pager"></div>
+        </div>
+      </section>
+    </div>
+    
+  </main>
+  <div id="layoutBottom"></div>
+  <script type="module" src="products.js"></script>
+</body>
+</html>
