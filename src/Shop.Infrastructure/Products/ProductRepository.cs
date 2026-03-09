@@ -1,114 +1,113 @@
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Shop.Application.Products;
-using Shop.Infrastructure.Products;
-using Shop.Infrastructure.Persistence;
 
 namespace Shop.Infrastructure.Products;
 
 public class ProductRepository : IProductRepository
 {
-    private readonly ShopDbContext _context;
-    
+    private readonly string _connStr;
+    public ProductRepository(IConfiguration config) => _connStr = config.GetConnectionString("Default")!;
 
-    public ProductRepository(ShopDbContext context)
+    public async Task<(int Total, IEnumerable<object> Items)> GetProductsAsync(string? search, string? cat, string? sort, decimal? minPrice, decimal? maxPrice, int page, int pageSize)
     {
-        _context = context;
-    }
+        using var conn = new SqlConnection(_connStr);
+        await conn.OpenAsync();
 
-    public async Task<IEnumerable<Product>> GetAllAsync()
-    {
-        return await _context.Products.ToListAsync();
-    }
-
-    public async Task<Product?> GetByIdAsync(int id)
-    {
-        return await _context.Products
-            .Include(p => p.BienThes)
-            .FirstOrDefaultAsync(p => p.MaSanPham == id);
-    }
-
-    public async Task<int> CreateAsync(Product product)
-    {
-        _context.Products.Add(product);
-        await _context.SaveChangesAsync();
-        return product.MaSanPham;
-    }
-
-    public async Task UpdateAsync(Product product)
-    {
-        _context.Entry(product).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task DeleteAsync(int id)
-    {
-        var product = await _context.Products.FindAsync(id);
-        if (product != null)
-        {
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-        }
-    }
-
-    public async Task<bool> SaveChangesAsync()
-    {
-        return (await _context.SaveChangesAsync()) > 0;
-    }
-
-    public async Task<bool> UpdateStockAsync(int variantId, int quantityChange)
-    {
-        var variant = await _context.ProductVariants.FindAsync(variantId);
-        if (variant == null) return false;
-
-    // Logic: Nếu quantityChange âm (bán hàng) thì trừ kho, dương (nhập hàng) thì cộng kho
-        variant.SoLuongTon += quantityChange;
-
-        if (variant.SoLuongTon < 0) return false; // Không cho phép kho âm
-
-        return await _context.SaveChangesAsync() > 0;
-    }
-    public async Task<bool> UpdateStockAfterSale(int variantId, int quantitySold)
-    {
-        var variant = await _context.ProductVariants.FindAsync(variantId);
-        if (variant == null || variant.SoLuongTon < quantitySold) return false;
-
-        variant.SoLuongTon -= quantitySold; // Trừ số lượng trong kho
-        return await _context.SaveChangesAsync() > 0;
-    }
-    public async Task<bool> UpdateStock(int variantId, int quantity)
-    {
-    // Tìm biến thể trong Database
-        var variant = await _context.BienTheSanPhams
-        .FirstOrDefaultAsync(v => v.MaBienThe == variantId);
-
-        if (variant == null || variant.SoLuongTon < quantity)
-        {
-            return false; // Trả về false nếu không tìm thấy hoặc không đủ hàng
-        }   
-
-    // Thực hiện trừ kho
-        variant.SoLuongTon -= quantity;
-    
-    // Lưu thay đổi xuống Database
-        return await _context.SaveChangesAsync() > 0;
+        // Xây dựng điều kiện lọc động (Dynamic WHERE)
+        string whereClause = "WHERE HoatDong = 1"; // Chỉ lấy sp đang bán
+        if (!string.IsNullOrEmpty(search)) whereClause += " AND TenSanPham LIKE '%' + @Search + '%'";
+        if (minPrice.HasValue) whereClause += " AND GiaGoc >= @MinPrice";
+        if (maxPrice.HasValue) whereClause += " AND GiaGoc <= @MaxPrice";
         
-    }   
-   public async Task<ProductVariant?> GetProductVariantById(int id)
-{
-    return await _context.ProductVariants
-        .FirstOrDefaultAsync(v => v.MaBienThe == id);
-}
-public async Task<Product?> GetByVariantIdAsync(int variantId)
-{
-    var variant = await _context.ProductVariants
-        .Include(v => v.Product)
-        .FirstOrDefaultAsync(v => v.ProductVariantId == variantId);
+        // Đoạn này nếu DB của bạn có bảng DanhMuc, bạn có thể JOIN. Tạm thời lọc theo tên/slug danh mục.
+        if (!string.IsNullOrEmpty(cat)) whereClause += " AND MaDanhMuc IN (SELECT MaDanhMuc FROM DanhMuc WHERE Slug = @Cat)";
 
-    if (variant == null)
-    {
-        return null;
+        // Xây dựng câu lệnh Sắp xếp động
+        string orderBy = sort switch
+        {
+            "new" => "ORDER BY MaSanPham DESC",
+            "price_asc" => "ORDER BY GiaGoc ASC",
+            "price_desc" => "ORDER BY GiaGoc DESC",
+            _ => "ORDER BY MaSanPham DESC" // Mặc định
+        };
+
+        // 1. Đếm tổng số sản phẩm (để Frontend làm phân trang)
+        var cmdCount = new SqlCommand($"SELECT COUNT(*) FROM SanPham {whereClause}", conn);
+        if (!string.IsNullOrEmpty(search)) cmdCount.Parameters.AddWithValue("@Search", search);
+        if (minPrice.HasValue) cmdCount.Parameters.AddWithValue("@MinPrice", minPrice.Value);
+        if (maxPrice.HasValue) cmdCount.Parameters.AddWithValue("@MaxPrice", maxPrice.Value);
+        if (!string.IsNullOrEmpty(cat)) cmdCount.Parameters.AddWithValue("@Cat", cat);
+        
+        int total = (int)await cmdCount.ExecuteScalarAsync();
+
+        // 2. Lấy dữ liệu theo trang (OFFSET FETCH)
+        int offset = (page - 1) * pageSize;
+        var cmdList = new SqlCommand($@"
+            SELECT MaSanPham, TenSanPham, Slug, GiaGoc, AnhDaiDien 
+            FROM SanPham 
+            {whereClause} 
+            {orderBy} 
+            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY", conn);
+
+        // Copy lại các tham số
+        foreach (SqlParameter p in cmdCount.Parameters) cmdList.Parameters.AddWithValue(p.ParameterName, p.Value);
+        cmdList.Parameters.AddWithValue("@Offset", offset);
+        cmdList.Parameters.AddWithValue("@PageSize", pageSize);
+
+        var items = new List<object>();
+        using var reader = await cmdList.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            items.Add(new {
+                MaSanPham = reader["MaSanPham"],
+                TenSanPham = reader["TenSanPham"].ToString(),
+                Slug = reader["Slug"].ToString(),
+                GiaGoc = reader["GiaGoc"],
+                AnhDaiDien = reader["AnhDaiDien"].ToString() 
+            });
+        }
+
+        return (total, items);
     }
 
-    return variant.Product;
-}
+    public async Task<object?> GetProductDetailAsync(int id)
+    {
+        using var conn = new SqlConnection(_connStr);
+        await conn.OpenAsync();
+
+        // 1. Lấy thông tin gốc sản phẩm
+        var cmdProd = new SqlCommand("SELECT * FROM SanPham WHERE MaSanPham = @Id", conn);
+        cmdProd.Parameters.AddWithValue("@Id", id);
+        using var reader = await cmdProd.ExecuteReaderAsync();
+        if (!await reader.ReadAsync()) return null;
+
+        var product = new {
+            MaSanPham = reader["MaSanPham"],
+            TenSanPham = reader["TenSanPham"].ToString(),
+            Slug = reader["Slug"].ToString(),
+            MoTa = reader["MoTa"].ToString(),
+            GiaGoc = reader["GiaGoc"]
+        };
+        await reader.CloseAsync();
+
+        // 2. Lấy danh sách biến thể (Màu, Size)
+        var cmdVars = new SqlCommand("SELECT * FROM BienTheSanPham WHERE MaSanPham = @Id", conn);
+        cmdVars.Parameters.AddWithValue("@Id", id);
+        var variants = new List<object>();
+        using var readerVars = await cmdVars.ExecuteReaderAsync();
+        while (await readerVars.ReadAsync())
+        {
+            variants.Add(new {
+                MaMauSac = readerVars["MaMauSac"],
+                MaKichCo = readerVars["MaKichCo"],
+                SKU = readerVars["SKU"].ToString(),
+                SoLuongTon = readerVars["SoLuongTon"],
+                DieuChinhGia = readerVars["DieuChinhGia"]
+            });
+        }
+
+        // Trả về format chuẩn { product, variants, images }
+        return new { product = product, variants = variants, images = new List<object>() };
+    }
 }
