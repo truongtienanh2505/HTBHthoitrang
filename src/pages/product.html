@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shop | Chi tiết</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+</head>
+<body>
+  <div id="layoutTop"></div>
+  <main class="container layout">
+    
+    <div class="breadcrumbs" id="crumbs"></div>
+
+    <div id="pdpRoot">
+      <div class="pdp">
+        <div class="gallery">
+          <div class="gallery__main" id="galleryMain"></div>
+          <div class="gallery__thumbs" id="galleryThumbs"></div>
+        </div>
+
+        <div class="pdp__info">
+          <h1 class="pdp__title" id="title">...</h1>
+          <div class="ratingline" id="rating"></div>
+
+          <div class="pdp__price">
+            <div class="price" id="priceNow"></div>
+            <div class="price price--old" id="priceOld" style="display:none"></div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <span class="label">Tồn kho</span>
+              <div><b id="stock">--</b></div>
+            </div>
+            <div class="field">
+              <span class="label">SKU</span>
+              <div class="smallhint" id="sku">--</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="label">Màu</div>
+          <div class="variantRow" id="colorRow"></div>
+
+          <div class="label">Size</div>
+          <div class="variantRow" id="sizeRow"></div>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <div class="field">
+              <span class="label">Số lượng</span>
+              <div class="qty">
+                <button id="btnMinus">-</button>
+                <input class="input" id="qtyInput" value="1" />
+                <button id="btnPlus">+</button>
+              </div>
+            </div>
+            <div class="field">
+              <span class="label">Wishlist</span>
+              <button class="btn btn--ghost" id="btnWish" style="width:100%"><span class="icon-heart"></span> Thêm</button>
+            </div>
+          </div>
+
+          <div class="actionsWide">
+            <button class="btn btn--ghost" id="btnAdd">Thêm giỏ</button>
+            <button class="btn btn--primary" id="btnBuy">Mua ngay</button>
+          </div>
+
+          <div class="tabs">
+            <div class="tabbar">
+              <button class="tab" data-tab="desc">Mô tả</button>
+              <button class="tab" data-tab="reviews">Đánh giá</button>
+            </div>
+
+            <div class="tabpanes">
+              <div class="pane" id="tabDesc">
+                <div class="pre" id="paneDesc"></div>
+              </div>
+              <div class="pane" id="tabReviews" style="display: none;">
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
+                    <h3 style="margin-bottom: 10px; font-size: 16px;">Viết đánh giá của bạn</h3>
+                    <div class="row">
+                        <div class="field" style="width: 150px;">
+                            <label class="label">Số sao (1-5)</label>
+                            <input type="number" id="reviewStar" class="input" min="1" max="5" value="5">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Nội dung</label>
+                        <textarea id="reviewContent" class="input" rows="3" placeholder="Sản phẩm này chất lượng thế nào? Bạn có hài lòng không?"></textarea>
+                    </div>
+                    <button class="btn btn--primary" id="btnSubmitReview">Gửi đánh giá</button>
+                </div>
+                
+                <h3 style="margin-bottom: 15px; font-size: 16px;">Đánh giá từ khách hàng</h3>
+                <div id="reviewList">Đang tải đánh giá...</div>
+            </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    
+  </main>
+  <div id="layoutBottom"></div>
+  <script type="module" src="product.js"></script>
+</body>
+</html>

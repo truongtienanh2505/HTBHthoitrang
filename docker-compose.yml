@@ -3,6 +3,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: shop-sql
     environment:
+
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Developer"
       MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
@@ -19,7 +20,7 @@ services:
       retries: 30
 
   db-init:
-    image: mcr.microsoft.com/mssql-tools18
+    image: mcr.microsoft.com/mssql/server:2022-latest
     profiles: ["tools"]
     depends_on:
       - sqlserver

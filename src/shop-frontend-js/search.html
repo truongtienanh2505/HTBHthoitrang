@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm Kiếm Sản Phẩm</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
+        
+        /* HEADER - SEARCH BAR */
+        .header { background: #fff; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 24px; font-weight: bold; color: #e74c3c; text-decoration: none; }
+        .search-bar { display: flex; gap: 10px; width: 50%; }
+        .search-bar input { flex: 1; padding: 12px 15px; border: 1px solid #ddd; border-radius: 25px; outline: none; font-size: 15px; transition: 0.3s; }
+        .search-bar input:focus { border-color: #e74c3c; box-shadow: 0 0 5px rgba(231, 76, 60, 0.3); }
+        .search-bar button { padding: 10px 25px; background: #e74c3c; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .search-bar button:hover { background: #c0392b; }
+
+        /* MAIN LAYOUT */
+        .container { display: flex; max-width: 1200px; margin: 30px auto; gap: 30px; padding: 0 20px; }
+        
+        /* SIDEBAR - FILTER */
+        .sidebar { width: 260px; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content; }
+        .sidebar h3 { margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px; font-size: 18px; }
+        .filter-group { margin-bottom: 20px; }
+        .filter-group label { display: block; font-weight: 600; margin-bottom: 10px; font-size: 14px; color: #555; }
+        .filter-group input, .filter-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; font-size: 14px; outline: none; }
+        .btn-filter { width: 100%; padding: 12px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.3s; margin-top: 10px; }
+        .btn-filter:hover { background: #1a252f; }
+
+        /* PRODUCT GRID */
+        .content { flex: 1; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
+        .product-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; transition: transform 0.3s, box-shadow 0.3s; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .product-card img { width: 100%; height: 220px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
+        .product-title { font-size: 16px; font-weight: 600; color: #333; margin: 0 0 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { color: #e74c3c; font-weight: bold; font-size: 18px; margin-bottom: 15px; }
+        .btn-view { width: 100%; padding: 10px; background: transparent; border: 1.5px solid #e74c3c; color: #e74c3c; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .btn-view:hover { background: #e74c3c; color: white; }
+        
+        .loading { text-align: center; width: 100%; padding: 50px; font-size: 18px; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="#" class="logo">👗 ShopThờiTrang</a>
+        <div class="search-bar">
+            <input type="text" id="keyword" placeholder="Tìm áo thun, quần jean, váy..." onkeypress="handleKeyPress(event)">
+            <button onclick="executeSearch()">TÌM KIẾM</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <h3>Lọc Sản Phẩm</h3>
+            
+            <div class="filter-group">
+                <label>Khoảng Giá (VNĐ)</label>
+                <input type="number" id="minPrice" placeholder="Giá thấp nhất...">
+                <input type="number" id="maxPrice" placeholder="Giá cao nhất...">
+            </div>
+
+            <div class="filter-group">
+                <label>Màu Sắc</label>
+                <select id="colorSelect">
+                    <option value="">-- Tất cả màu --</option>
+                    <option value="1">Đen</option>
+                    <option value="2">Trắng</option>
+                    <option value="3">Đỏ</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Kích Cỡ (Size)</label>
+                <select id="sizeSelect">
+                    <option value="">-- Tất cả Size --</option>
+                    <option value="1">Size S</option>
+                    <option value="2">Size M</option>
+                    <option value="3">Size L</option>
+                    <option value="4">Size XL</option>
+                </select>
+            </div>
+
+            <button class="btn-filter" onclick="executeSearch()">ÁP DỤNG LỌC</button>
+        </div>
+
+        <div class="content">
+            <h2 id="resultText" style="margin-top: 0; margin-bottom: 20px; font-size: 20px;">Tất cả sản phẩm</h2>
+            <div class="product-grid" id="productResults">
+                </div>
+        </div>
+    </div>
+
+    <script src="search.js"></script>
+</body>
+</html>
