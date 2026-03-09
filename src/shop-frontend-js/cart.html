@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ Hàng & Thanh Toán</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1200px; margin: auto; display: flex; gap: 30px; }
+        
+        /* CỘT GIỎ HÀNG */
+        .cart-section { flex: 2; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #eee; }
+        .item-info { display: flex; align-items: center; gap: 15px; flex: 1; }
+        .item-info img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+        .qty-controls { display: flex; align-items: center; gap: 10px; }
+        .qty-btn { width: 30px; height: 30px; background: #f0f0f0; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .qty-btn:hover { background: #ddd; }
+        .item-price { font-weight: bold; color: #e74c3c; width: 120px; text-align: right; }
+        .remove-btn { color: #e74c3c; cursor: pointer; border: none; background: none; font-weight: bold; margin-left: 15px;}
+
+        /* CỘT CHECKOUT */
+        .checkout-section { flex: 1; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: fit-content; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; outline: none; }
+        .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin: 20px 0; padding-top: 15px; border-top: 2px dashed #eee; }
+        .btn-checkout { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-checkout:hover { background: #2ecc71; }
+    </style>
+</head>
+<body>
+
+    <h2 style="text-align: center; color: #2c3e50;">🛍️ Giỏ Hàng Của Bạn</h2>
+
+    <div class="container">
+        <div class="cart-section">
+            <h3>Sản phẩm trong giỏ</h3>
+            <div id="cartItemsContainer">
+                </div>
+        </div>
+
+        <div class="checkout-section">
+            <h3>Thông tin giao hàng</h3>
+            <form onsubmit="handleCheckout(event)">
+                <div class="form-group">
+                    <label>Họ và tên người nhận</label>
+                    <input type="text" id="custName" required placeholder="Nhập họ tên...">
+                </div>
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="tel" id="custPhone" required placeholder="Nhập SĐT...">
+                </div>
+                <div class="form-group">
+                    <label>Địa chỉ nhận hàng</label>
+                    <input type="text" id="custAddress" required placeholder="Số nhà, đường, phường, quận...">
+                </div>
+                
+                <div class="total-row">
+                    <span>Tổng thanh toán:</span>
+                    <span id="totalPrice" style="color: #e74c3c;">0 ₫</span>
+                </div>
+
+                <button type="submit" class="btn-checkout">ĐẶT HÀNG NGAY</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="cart.js"></script>
+</body>
+</html>

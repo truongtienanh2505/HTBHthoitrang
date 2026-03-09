@@ -1,3 +1,5 @@
+using Shop.Application.Auth; 
+using Shop.Infrastructure.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +22,11 @@ public static class DependencyInjection
         
         services.AddScoped<IProductRepository, ProductRepository>();
 
+        services.AddScoped<IAuthService, AuthService>();
+
+        services.AddScoped<Shop.Infrastructure.Search.SearchService>();
+
+        services.AddScoped<Shop.Infrastructure.Orders.OrderService>();
         return services;
         
     }

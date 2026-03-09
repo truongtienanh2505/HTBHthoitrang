@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Shop.Application.Categories.Models;
-using Shop.Application.Products;
-using Shop.Infrastructure.Products;
-using Shop.Application.Models;
+using Shop.Application.Auth.Models; 
+using Shop.Application.Products.Models;
+using Shop.Application.Orders.Models;
+
 namespace Shop.Infrastructure.Persistence;
 
 public class ShopDbContext : DbContext
@@ -22,7 +23,14 @@ public class ShopDbContext : DbContext
     public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options) { }
 
     public DbSet<DanhMucTreeRow> DanhMucTreeRows => Set<DanhMucTreeRow>();
+    
+    public DbSet<SanPham> SanPhams => Set<SanPham>();
+    
+    public DbSet<NguoiDung> NguoiDungs => Set<NguoiDung>(); 
 
+    public DbSet<DonHang> DonHangs => Set<DonHang>();
+    public DbSet<LichSuDonHang> LichSuDonHangs => Set<LichSuDonHang>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -51,53 +59,13 @@ public class ShopDbContext : DbContext
             e.HasNoKey();
             e.ToView(null);
         });
-        modelBuilder.Entity<ProductVariant>()
-        .Property(p => p.GiaBienThe)
-        .HasColumnType("decimal(18,2)");
-        modelBuilder.Entity<KhuyenMai>(entity =>
-    {
-        entity.ToTable("KhuyenMai", "dbo");
-        entity.HasKey(e => e.MaKhuyenMai);
 
-    // Ràng buộc loại giảm giá theo SQL
-        entity.Property(e => e.LoaiGiamGia).IsRequired().HasMaxLength(20);
-    
-    // Ràng buộc giá trị giảm (0 < GiaTriGiam <= 100 nếu là PERCENTAGE)
-        entity.Property(e => e.GiaTriGiam).HasColumnType("decimal(18,2)");
-        entity.Property(e => e.GiamToiDa).HasPrecision(18, 2);
-});
-
-        modelBuilder.Entity<SanPhamKhuyenMai>(entity =>
-    {
-        entity.ToTable("SanPhamKhuyenMai", "dbo");
-        entity.HasKey(e => e.Ma);
-
-    // Cấu hình quan hệ với Khuyến mãi
-        entity.HasOne(d => d.KhuyenMai)
-            .WithMany(p => p.SanPhamKhuyenMais) 
-            .HasForeignKey(d => d.MaKhuyenMai)
-            .OnDelete(DeleteBehavior.Cascade);
-
-    // Cấu hình quan hệ với Sản phẩm
-        entity.HasOne(d => d.SanPham)
-            .WithMany() // Để trống nếu bên SanPham.cs chưa có ICollection<SanPhamKhuyenMai>
-            .HasForeignKey(d => d.MaSanPham)
-            .OnDelete(DeleteBehavior.Cascade);
-});
-        modelBuilder.Entity<DieuKienKhuyenMai>(entity =>
-    {
-        entity.HasKey(e => e.Ma); // Xác định Ma là khóa chính
-        entity.ToTable("DieuKienKhuyenMai", "dbo");
-
-        entity.HasOne(d => d.KhuyenMai)
-            .WithMany(p => p.DieuKiens)
-            .HasForeignKey(d => d.MaKhuyenMai)
-            .OnDelete(DeleteBehavior.Cascade);
-            
-});
-    modelBuilder.Entity<ProductVariant>()
-        .ToTable("ProductVariants");
-
-    base.OnModelCreating(modelBuilder);
-}
+        // Cấu hình bảng NguoiDung
+        modelBuilder.Entity<NguoiDung>(e =>
+        {
+            e.ToTable("NguoiDung", "dbo");
+            e.HasKey(x => x.MaNguoiDung);
+            e.HasIndex(x => x.Email).IsUnique();
+        });
+    }
 }
